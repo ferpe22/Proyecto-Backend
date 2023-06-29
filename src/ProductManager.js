@@ -117,8 +117,12 @@ class ProductManager {
     }
 }
 
+module.exports = ProductManager
+
+
 
 //////////////////////////////////////////////////////////////////////////////////
+/*
 //VALIDACIONES Y TESTS
 const manager = new ProductManager('./products.json')
 

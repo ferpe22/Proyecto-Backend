@@ -2,7 +2,7 @@
   "name": "proyectovendemostodo",
   "version": "1.0.0",
   "description": "Proyecto entregable para curso de backend",
-  "main": "index.js",
+  "main": "./src/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

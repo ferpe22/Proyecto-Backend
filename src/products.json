@@ -1,20 +1,120 @@
 [
   {
-    "title": "yerba",
-    "description": "playadito",
-    "price": 800,
+    "title": "Botines Adidas Davicto",
+    "description": "Talle 41. Con tapones",
+    "price": 12500,
     "thumbnail": "img",
-    "code": "barras",
-    "stock": 33,
+    "code": "VT-012",
+    "stock": 1,
     "id": 1
   },
   {
-    "title": "azucar",
-    "description": "domino",
-    "price": 475,
+    "title": "Zapatilla Topper",
+    "description": "Cuero. Color negro",
+    "price": 7000,
     "thumbnail": "img",
-    "code": "qwerty",
-    "stock": 22,
+    "code": "VT-013",
+    "stock": 1,
     "id": 2
+  },
+
+  {
+    "title": "Consola Xbox One S ",
+    "description": "500gb - Joystick - Kinect",
+    "price": 150000,
+    "thumbnail": "img",
+    "code": "VT-001",
+    "stock": 1,
+    "id": 3
+  },
+
+  {
+    "title": "Teclado Logitech K120",
+    "description": "Idioma ingles",
+    "price": 3000,
+    "thumbnail": "img",
+    "code": "VT-002",
+    "stock": 1,
+    "id": 4
+  },
+
+  {
+    "title": "Secador de pelo Revlon",
+    "description": "Pro Collection 1400w",
+    "price": 6000,
+    "thumbnail": "img",
+    "code": "VT-003",
+    "stock": 1,
+    "id": 5
+  },
+
+  {
+    "title": "Soporte base elavador monitor",
+    "description": "De madera, color negro",
+    "price": 8000,
+    "thumbnail": "img",
+    "code": "VT-004",
+    "stock": 1,
+    "id": 6
+  },
+
+  {
+    "title": "Juego de sabanas 2 1/2 Pierre Balmain",
+    "description": "Floreado",
+    "price": 15000,
+    "thumbnail": "img",
+    "code": "VT-005",
+    "stock": 1,
+    "id": 7
+  },
+
+  {
+    "title": "Combo antiparras + gorro natacion",
+    "description": "Casi nuevo",
+    "price": 4500,
+    "thumbnail": "img",
+    "code": "VT-006",
+    "stock": 1,
+    "id": 8
+  },
+
+  {
+    "title": "Bordeadora Philco MJPB0126",
+    "description": "500w",
+    "price": 12500,
+    "thumbnail": "img",
+    "code": "VT-007",
+    "stock": 1,
+    "id": 9
+  },
+
+  {
+    "title": "Auriculares Noblex HP107",
+    "description": "Como nuevos",
+    "price": 2000,
+    "thumbnail": "img",
+    "code": "VT-008",
+    "stock": 1,
+    "id": 10
+  },
+
+  {
+    "title": "Valija Primark",
+    "description": "Gris - 23 kgs",
+    "price": 30000,
+    "thumbnail": "img",
+    "code": "VT-009",
+    "stock": 1,
+    "id": 11
+  },
+
+  {
+    "title": "Reposeras 3 posiciones",
+    "description": "Color azul",
+    "price": 8000,
+    "thumbnail": "img",
+    "code": "VT-010",
+    "stock": 2,
+    "id": 12
   }
 ]
