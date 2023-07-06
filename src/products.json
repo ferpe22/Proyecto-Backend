@@ -4,8 +4,10 @@
     "description": "Talle 41. Con tapones",
     "price": 12500,
     "thumbnail": "img",
-    "code": "VT-012",
+    "code": "VT-011",
     "stock": 1,
+    "category": "Calzado",
+    "status": true,
     "id": 1
   },
   {
@@ -13,11 +15,12 @@
     "description": "Cuero. Color negro",
     "price": 7000,
     "thumbnail": "img",
-    "code": "VT-013",
+    "code": "VT-012",
     "stock": 1,
+    "category": "Calzado",
+    "status": true,
     "id": 2
   },
-
   {
     "title": "Consola Xbox One S ",
     "description": "500gb - Joystick - Kinect",
@@ -25,9 +28,10 @@
     "thumbnail": "img",
     "code": "VT-001",
     "stock": 1,
+    "category": "Informatica",
+    "status": true,
     "id": 3
   },
-
   {
     "title": "Teclado Logitech K120",
     "description": "Idioma ingles",
@@ -35,9 +39,10 @@
     "thumbnail": "img",
     "code": "VT-002",
     "stock": 1,
+    "category": "Informatica",
+    "status": true,
     "id": 4
   },
-
   {
     "title": "Secador de pelo Revlon",
     "description": "Pro Collection 1400w",
@@ -45,9 +50,10 @@
     "thumbnail": "img",
     "code": "VT-003",
     "stock": 1,
+    "category": "Electro",
+    "status": true,
     "id": 5
   },
-
   {
     "title": "Soporte base elavador monitor",
     "description": "De madera, color negro",
@@ -55,9 +61,10 @@
     "thumbnail": "img",
     "code": "VT-004",
     "stock": 1,
+    "category": "Informatica",
+    "status": true,
     "id": 6
   },
-
   {
     "title": "Juego de sabanas 2 1/2 Pierre Balmain",
     "description": "Floreado",
@@ -65,9 +72,10 @@
     "thumbnail": "img",
     "code": "VT-005",
     "stock": 1,
+    "category": "Blanqueria",
+    "status": true,
     "id": 7
   },
-
   {
     "title": "Combo antiparras + gorro natacion",
     "description": "Casi nuevo",
@@ -75,9 +83,10 @@
     "thumbnail": "img",
     "code": "VT-006",
     "stock": 1,
+    "category": "Deportes",
+    "status": true,
     "id": 8
   },
-
   {
     "title": "Bordeadora Philco MJPB0126",
     "description": "500w",
@@ -85,9 +94,10 @@
     "thumbnail": "img",
     "code": "VT-007",
     "stock": 1,
+    "category": "Electro",
+    "status": true,
     "id": 9
   },
-
   {
     "title": "Auriculares Noblex HP107",
     "description": "Como nuevos",
@@ -95,9 +105,10 @@
     "thumbnail": "img",
     "code": "VT-008",
     "stock": 1,
+    "category": "Informatica",
+    "status": true,
     "id": 10
   },
-
   {
     "title": "Valija Primark",
     "description": "Gris - 23 kgs",
@@ -105,9 +116,10 @@
     "thumbnail": "img",
     "code": "VT-009",
     "stock": 1,
+    "category": "Viaje",
+    "status": true,
     "id": 11
   },
-
   {
     "title": "Reposeras 3 posiciones",
     "description": "Color azul",
@@ -115,6 +127,19 @@
     "thumbnail": "img",
     "code": "VT-010",
     "stock": 2,
+    "category": "Viaje",
+    "status": true,
     "id": 12
+  },
+  {
+    "title": "Parlantes Makie",
+    "description": "CR-XBT",
+    "price": 45000,
+    "thumbnail": "img1",
+    "code": "VT-013",
+    "stock": 1,
+    "category": "Electro",
+    "status": true,
+    "id": 13
   }
 ]

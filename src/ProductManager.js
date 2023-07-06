@@ -27,7 +27,9 @@ class ProductManager {
             price: data.price,
             thumbnail: data.thumbnail,
             code: data.code,
-            stock: data.stock
+            stock: data.stock,
+            category: data.category,
+            status: data.status,
         }
 
         return this.getProducts()
@@ -39,7 +41,9 @@ class ProductManager {
                     data.price=== '' ||
                     data.thumbnail === '' ||
                     data.code === '' ||
-                    data.stock === '') 
+                    data.stock === '' ||
+                    data.category === '' ||
+                    data.status === '' ) 
                     {
                     return console.log('Todos los capos son obligatorios')
                 }
@@ -80,14 +84,17 @@ class ProductManager {
             const productoIndex = products.findIndex(producto => producto.id === id)
 
             if(productoIndex === -1) {
-                return
+                return 'El ID del producto no existe'
             }
 
-            products[productoIndex].title = data.title
-            products[productoIndex].description = data.description
-            products[productoIndex].price = data.price
-            products[productoIndex].code = data.code
-            products[productoIndex].stock = data.stock
+            products[productoIndex].title = data.title || products[productoIndex].title
+            products[productoIndex].description = data.description || products[productoIndex].description
+            products[productoIndex].price = data.price || products[productoIndex].price
+            products[productoIndex].thumbnail = data.thumbnail || products[productoIndex].thumbnail
+            products[productoIndex].code = data.code || products[productoIndex].code
+            products[productoIndex].stock = data.stock || products[productoIndex].stock
+            products[productoIndex].category = data.category || products[productoIndex].category
+            products[productoIndex].status = data.status || products[productoIndex].status
 
             return fs.promises.writeFile(this.path, JSON.stringify(products, null, 2))
             })
@@ -103,15 +110,16 @@ class ProductManager {
             const prodIndex = products.findIndex(producto => producto.id === id)
 
             if(prodIndex === -1) {
-                return console.log('No se ha encontrado el producto')
+                return res.status(404).json({
+                    error: 'Product not found'
+                })
             }
 
             products.splice(prodIndex, 1)
-            console.log(`Se ha eliminado el producto`)
+            
             return fs.promises.writeFile(this.path, JSON.stringify(products, null, 2))
             })
         .catch(error => {
-            console.log('Error al actualizar el producto')
             return error
         })
     }
