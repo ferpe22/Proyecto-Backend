@@ -19,10 +19,11 @@ cartsRouter.post('/', async (req, res) => {
         const cart = req.body
         await manager.addCart(cart)
 
-        return res.status(201).json(cart)
+        return res.status(201).json({ status: 'success', message: 'Carrito agregado exitosamente' })
+        
     }
-    catch (err) {
-        console.log(err)
+    catch (error) {
+        return res.status(500).json({ error: 'Error al agregar el carrito', message: error.message })
     }
 })
 
@@ -52,11 +53,31 @@ cartsRouter.post('/:cid/product/:pid', async (req, res) => {
         if(!cartFilteredById) {
             res.status(404).send('El carrito no existe')
         }
-        const product = {
-            id: product.id
-        }
-        cart.product.push(product)
         
+        const productFilteredById = await manager.getCartById(prodId)
+        
+        if(!productFilteredById) {
+            return res.status(404).send('El producto no existe')
+        }
+        const prodEnCart = cartFilteredById.products.find( e => e.product === prodId)
+
+        if(!prodEnCart){
+            const newProductoInCart = {
+                product: prodId,
+                quantity: 1
+            }
+            cartFilteredById.products.push(newProductoInCart)
+        } else {
+            prodEnCart.quantity++
+        }
+        
+        // const prod = {
+        //     id: prod.id 
+        // }
+        // cart.product.push(prod)
+
+        await manager.updateCart(cartId, cartFilteredById)
+
         return res.status(201).json(cartFilteredById)
     }
     catch (err) {

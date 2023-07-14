@@ -133,7 +133,7 @@
   },
   {
     "title": "Parlantes Makie",
-    "description": "CR-XBT",
+    "description": "CR3-XBT",
     "price": 45000,
     "thumbnail": "img1",
     "code": "VT-013",
@@ -141,5 +141,16 @@
     "category": "Electro",
     "status": true,
     "id": 13
+  },
+  {
+    "title": "Smarthphone Xiaomi",
+    "description": "Poco 3",
+    "price": 180000,
+    "thumbnail": "img2",
+    "code": "VT-014",
+    "stock": 1,
+    "category": "Electro",
+    "status": true,
+    "id": 14
   }
 ]

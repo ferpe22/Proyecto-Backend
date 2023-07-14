@@ -2,11 +2,11 @@ const fs = require('fs')
 
 class CartManager {
     constructor(path) {
-    this.path = path
+        this.path = path
     }
 
     getCarts () {
-    return fs.promises.readFile(this.path, 'utf-8')
+        return fs.promises.readFile(this.path, 'utf-8')
         .then((cartsString) => {
             const carritos = JSON.parse(cartsString)
             return carritos
@@ -16,15 +16,15 @@ class CartManager {
             return console.log('carrito vacio') 
         }) 
     }
-
-    addCart (data) {
+    
+    addCart(data) {
         const nvoCarrito = {
             products: data.products || []
         }
 
         return this.getCarts()
-            .this(carts => {
-                nvoCarrito.id = carts.length + 1,
+            .then(carts => {
+                nvoCarrito.id = carts.length + 1
                 carts.push(nvoCarrito)
 
                 return fs.promises.writeFile(this.path, JSON.stringify(carts, null, 2))
@@ -47,6 +47,24 @@ class CartManager {
             return err
         })
     }
+
+    updateCart(id, data) {
+        return this.getCarts()
+        .then(carts => {
+            const cartIndex = carts.findIndex(carrito => carrito.id === id)
+
+            if(cartIndex !== -1) {
+                carts[cartIndex].products = data.products
+                return fs.promises.writeFile(this.path, JSON.stringify(products, null, 2))
+            }
+
+            })
+        .catch(error => {
+            console.log('Error al actualizar el carrito')
+            return error
+        })
+    }
+
 }
 
 
