@@ -1,18 +1,18 @@
 const { Router } = require('express')
 const productsRouter = Router()
 
-
-const ProductManager = require('../ProductManager')
+const ProductManager = require('../managers/ProductManager')
 const manager = new ProductManager('./src/products.json')
 
 productsRouter.get('/', async (req, res) => {
     try {
-        const products = await manager.getProducts(req.query.limit)
+        const products = await manager.getProducts()
+        const limit = req.query.limit
 
-        if(!req.query.limit) {
+        if(!limit) {
             return res.status(200).send(products)
         } else {
-            const limitedProd = products.slice(0, req.query.limit)
+            const limitedProd = products.slice(0, limit)
             return res.status(200).send(limitedProd)
         }
     }

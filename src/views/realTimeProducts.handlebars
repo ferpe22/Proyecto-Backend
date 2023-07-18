@@ -1,0 +1,79 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+
+<h1>Vista del realTimeProducts</h1>
+
+<table id="productos">
+    <tr>
+        <th>ID</th>
+        <th>Titulo</th>
+        <th>Descripción</th>
+        <th>Codigo</th>
+        <th>Categoria</th>
+        <th>Stock</th>
+        <th>Precio</th>
+        <th>Borrar</th>
+    </tr>
+    {{#each products}}
+        <tr>
+            <td>{{this.id}}</td>
+            <td>{{this.title}}</td>
+            <td>{{this.description}}</td>
+            <td>{{this.code}}</td>
+            <td>{{this.category}}</td>
+            <td>{{this.stock}}</td>
+            <td>{{this.price}}</td>
+            <td><button class="deleteBtn" id="deleteBtn_{{this.id}}" onclick="deleteProduct({{this.id}})">Borrar</button></td>
+        </tr>
+    {{/each}}
+</table>
+
+<div class="container">
+    <div>
+        <h1>AGREGAR PRODUCTO</h1>
+        <form id="formBtn"> 
+            <div class="mb-3">
+                <label for="title" class="form-label">Title:</label>
+                <input type="text" class="form-control" id="titleInput" placeholder="">
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label>
+                <input type="text" class="form-control" id="descriptionInput" placeholder="">
+            </div>
+            <div class="mb-3">
+                <label for="price" class="form-label">Price:</label>
+                <input type="text" class="form-control" id="priceInput" placeholder="">
+            </div>
+            <div class="mb-3">
+                <label for="code" class="form-label">Code:</label>
+                <input type="text" class="form-control" id="codeInput" placeholder="">
+            </div>
+            <div class="mb-3">
+                <label for="stock" class="form-label">Stock:</label>
+                <input type="number" class="form-control" id="stockInput" placeholder="">
+            </div>
+            <div class="mb-3">
+                <label for="category" class="form-label">Category:</label>
+                <input type="text" class="form-control" id="categoryInput" placeholder="">
+            </div>
+            <div class="mb-3">
+                <label for="category" class="form-label">Status:</label>
+                <input type="text" class="form-control" id="statusInput" placeholder="True o False">
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>
+    <div>
+        <h1>BORRAR PRODUCTO</h1>
+        <form>
+            <div class="mb-3">
+                <label for="id" class="form-label">Introduzca el id:</label>
+                <input type="number" class="form-control" id="" placeholder="">
+            </div>
+            <button type="submit" class="btn btn-danger">Borrar</button>
+        </form>
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/realTimeProducts.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>

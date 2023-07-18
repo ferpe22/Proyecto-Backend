@@ -1,7 +1,7 @@
 const { Router } = require('express')
 const cartsRouter = Router()
 
-const CartManager = require('../CartManager')
+const CartManager = require('../managers/CartManager')
 const manager = new CartManager('./src/carts.json')
 
 cartsRouter.get('/', async (req, res) => {

@@ -1,8 +1,9 @@
 const fs = require('fs')
 
 class ProductManager {
-    constructor(path) {
+    constructor(path, socketServer) {
         this.path = path
+        this.socketServer = this.socketServer
     }
 
     //Visualizar el array de productos
