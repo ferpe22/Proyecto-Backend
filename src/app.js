@@ -1,9 +1,10 @@
 const express = require('express') //Requiero express
-const productsRouter = require('./routers/productsRouter') //Requiero el router de productos
+const productsRouterFn = require('./routers/productsRouter') //Requiero el router de productos
 const cartsRouter = require('./routers/cartsRouter') //Requiero el router de carritos
-const viewsRouter = require('./routers/viewsRouter')
+const viewsRouterFn = require('./routers/viewsRouter')
 const handlebars = require('express-handlebars') //Requiero handlebars, el motor de plantillas
 const socketServer = require('./utils/io')
+const ProductManager = require('./managers/ProductManager')
 
 const app = express() //Creacion de aplicacion express
 
@@ -23,10 +24,37 @@ const PORT= 8080
 const httpServer = app.listen (PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`)) //servidor HTTP
 
 const io = socketServer(httpServer)
+const manager = new ProductManager('./src/products.json', io)
+io.on('connection', (socket) => {
+    console.log('Nuevo cliente conectado!', socket.id)
+
+    socket.on('AddProduct', async (data) => {
+        console.log(data)
+        const newProduct = JSON.parse(data)
+        try {
+            await manager.addProduct(newProduct)
+            io.emit('nuevoProducto', JSON.stringify(newProduct))
+        }
+        catch(error) {
+            io.emit('notification', 'Error al guardar el producto')
+        }
+    })
+    
+    socket.on('deleteProduct', async (id) => {
+        try{
+            const products = await manager.getProducts()
+        }
+        catch (error) {
+            return res.send( { error: 'Error al borrar el producto' } )
+        }
+    })
+})
 
 //ruta base de los routers
+const productsRouter = productsRouterFn(io)
 app.use('/api/products', productsRouter)
 app.use('/api/carts', cartsRouter)
+const viewsRouter = viewsRouterFn(io)
 app.use('/', viewsRouter)
 
 //ENDPOINTS

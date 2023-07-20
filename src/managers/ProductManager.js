@@ -1,9 +1,9 @@
 const fs = require('fs')
 
 class ProductManager {
-    constructor(path, socketServer) {
+    constructor(path, io) {
         this.path = path
-        this.socketServer = this.socketServer
+        this.io = io
     }
 
     //Visualizar el array de productos
@@ -58,6 +58,7 @@ class ProductManager {
                 products.push(nvoProd)
 
                 return fs.promises.writeFile(this.path, JSON.stringify(products, null, 2))
+
                 })
             .catch(error => {
                 console.log('Error al guardar el producto')

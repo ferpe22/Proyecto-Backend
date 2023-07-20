@@ -11,6 +11,7 @@
         <th>Categoria</th>
         <th>Stock</th>
         <th>Precio</th>
+        <th>Status</th>
         <th>Borrar</th>
     </tr>
     {{#each products}}
@@ -22,6 +23,7 @@
             <td>{{this.category}}</td>
             <td>{{this.stock}}</td>
             <td>{{this.price}}</td>
+            <td>{{this.status}}</td>
             <td><button class="deleteBtn" id="deleteBtn_{{this.id}}" onclick="deleteProduct({{this.id}})">Borrar</button></td>
         </tr>
     {{/each}}
@@ -30,7 +32,7 @@
 <div class="container">
     <div>
         <h1>AGREGAR PRODUCTO</h1>
-        <form id="formBtn"> 
+        <form id="formBtn" action="/realTimeProducts" method="POST"> 
             <div class="mb-3">
                 <label for="title" class="form-label">Title:</label>
                 <input type="text" class="form-control" id="titleInput" placeholder="">
@@ -40,36 +42,26 @@
                 <input type="text" class="form-control" id="descriptionInput" placeholder="">
             </div>
             <div class="mb-3">
-                <label for="price" class="form-label">Price:</label>
-                <input type="text" class="form-control" id="priceInput" placeholder="">
-            </div>
-            <div class="mb-3">
                 <label for="code" class="form-label">Code:</label>
                 <input type="text" class="form-control" id="codeInput" placeholder="">
-            </div>
-            <div class="mb-3">
-                <label for="stock" class="form-label">Stock:</label>
-                <input type="number" class="form-control" id="stockInput" placeholder="">
             </div>
             <div class="mb-3">
                 <label for="category" class="form-label">Category:</label>
                 <input type="text" class="form-control" id="categoryInput" placeholder="">
             </div>
             <div class="mb-3">
+                <label for="stock" class="form-label">Stock:</label>
+                <input type="number" class="form-control" id="stockInput" placeholder="">
+            </div>
+            <div class="mb-3">
+                <label for="price" class="form-label">Price:</label>
+                <input type="text" class="form-control" id="priceInput" placeholder="">
+            </div>
+            <div class="mb-3">
                 <label for="category" class="form-label">Status:</label>
                 <input type="text" class="form-control" id="statusInput" placeholder="True o False">
             </div>
-            <button type="submit" class="btn btn-primary">Guardar</button>
-        </form>
-    </div>
-    <div>
-        <h1>BORRAR PRODUCTO</h1>
-        <form>
-            <div class="mb-3">
-                <label for="id" class="form-label">Introduzca el id:</label>
-                <input type="number" class="form-control" id="" placeholder="">
-            </div>
-            <button type="submit" class="btn btn-danger">Borrar</button>
+            <input type="submit" value="Enviar" class="btn btn-primary"></input>
         </form>
     </div>
 </div>

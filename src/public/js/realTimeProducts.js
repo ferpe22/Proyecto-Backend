@@ -24,14 +24,11 @@ formBtn.addEventListener('submit', (event) => {
 
     console.log( { title, description, price, code, stock, category, status})
 
-    socket.emit('EnviarNewProduct', JSON.stringify({ title, description, price, code, stock, category, status }))
+    socket.emit('AddProduct', JSON.stringify({ title, description, price, code, stock, category, status }))
 })
 
 const deleteProduct = (id) => {
-    console.log('fn', id)
-    socket.emit('borrarProducto', id)
-
-    fetch(``, {
+    fetch(`/api/products/${id}`, {
         method: 'DELETE',
     })
 }
@@ -41,12 +38,13 @@ socket.on('nuevoProducto', (data) => {
 
     const productHTML = `
     <tr>
+        <td>${product.id}</td>
         <td>${product.title}</td>
         <td>${product.description}</td>
-        <td>${product.price}</td>
         <td>${product.code}</td>
-        <td>${product.stock}</td>
         <td>${product.category}</td>
+        <td>${product.stock}</td>
+        <td>${product.price}</td>
         <td>${product.status}</td>
     </tr>
     `
@@ -54,4 +52,8 @@ socket.on('nuevoProducto', (data) => {
     const table = document.getElementById('productos')
 
     table.innerHTML += productHTML
+})
+
+socket.on('productDeleted', (id) => {
+    deleteProduct(id)
 })

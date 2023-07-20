@@ -55,17 +55,6 @@
     "id": 5
   },
   {
-    "title": "Soporte base elavador monitor",
-    "description": "De madera, color negro",
-    "price": 8000,
-    "thumbnail": "img",
-    "code": "VT-004",
-    "stock": 1,
-    "category": "Informatica",
-    "status": true,
-    "id": 6
-  },
-  {
     "title": "Juego de sabanas 2 1/2 Pierre Balmain",
     "description": "Floreado",
     "price": 15000,
@@ -110,17 +99,6 @@
     "id": 10
   },
   {
-    "title": "Valija Primark",
-    "description": "Gris - 23 kgs",
-    "price": 30000,
-    "thumbnail": "img",
-    "code": "VT-009",
-    "stock": 1,
-    "category": "Viaje",
-    "status": true,
-    "id": 11
-  },
-  {
     "title": "Reposeras 3 posiciones",
     "description": "Color azul",
     "price": 8000,
@@ -130,27 +108,5 @@
     "category": "Viaje",
     "status": true,
     "id": 12
-  },
-  {
-    "title": "Parlantes Makie",
-    "description": "CR3-XBT",
-    "price": 45000,
-    "thumbnail": "img1",
-    "code": "VT-013",
-    "stock": 1,
-    "category": "Electro",
-    "status": true,
-    "id": 13
-  },
-  {
-    "title": "Smarthphone Xiaomi",
-    "description": "Poco 3",
-    "price": 180000,
-    "thumbnail": "img2",
-    "code": "VT-014",
-    "stock": 1,
-    "category": "Electro",
-    "status": true,
-    "id": 14
   }
 ]
