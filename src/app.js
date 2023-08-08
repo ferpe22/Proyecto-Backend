@@ -4,27 +4,41 @@ const cartsRouter = require('./routers/cartsRouter') //Requiero el router de car
 const viewsRouterFn = require('./routers/viewsRouter')
 const handlebars = require('express-handlebars') //Requiero handlebars, el motor de plantillas
 const socketServer = require('./utils/io')
-const ProductManager = require('./managers/ProductManager')
+const ProductManager = require('./dao/FileSystem/ProductManager')
+const mongoose = require('mongoose')
 
 const app = express() //Creacion de aplicacion express
+
 
 //Configuraicon de handlebars
 app.engine('handlebars', handlebars.engine()) //inicializar el motor
 app.set('views', './src/views') //ubicacion de  las vistas
 app.set('view engine', 'handlebars') //indicamos que el motor
 
+//Configuarion de Mongoose
+const MONGODB_CONNECT = 'mongodb+srv://ferpereira22:franco15@cluster0.vkepnh1.mongodb.net/ecommerce?retryWrites=true&w=majority'
+mongoose.connect(MONGODB_CONNECT)
+.then(() => console.log('Conectado a MongoDB'))
+.catch((error) => console.log(error))
+
+
 //Middlewares para manejar JSON y forms
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+
+
 //Middlewares de estaticos (configuracion la carpeta pubic de forma estatica)
 app.use(express.static(__dirname+ '/public'))
+
 
 //Se levanta los servidores HTTP y SOCKET para que ambos esten corriendo en el mismo puerto. Sobre e sevidor http esta corriendo el servidor socket
 const PORT= 8080
 const httpServer = app.listen (PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`)) //servidor HTTP
 
+
 const io = socketServer(httpServer)
 const manager = new ProductManager('./src/products.json', io)
+
 io.on('connection', (socket) => {
     console.log('Nuevo cliente conectado!', socket.id)
 
@@ -50,12 +64,14 @@ io.on('connection', (socket) => {
     })
 })
 
+
 //ruta base de los routers
 const productsRouter = productsRouterFn(io)
 app.use('/api/products', productsRouter)
 app.use('/api/carts', cartsRouter)
 const viewsRouter = viewsRouterFn(io)
 app.use('/', viewsRouter)
+
 
 //ENDPOINTS
 app.get('/healthcheck', (req, res) => {

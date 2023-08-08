@@ -108,5 +108,15 @@
     "category": "Viaje",
     "status": true,
     "id": 12
+  },
+  {
+    "title": "Notebook",
+    "description": "HP",
+    "price": "150000",
+    "code": "VT-1000",
+    "stock": "1",
+    "category": "Tecnologia",
+    "status": "true",
+    "id": 11
   }
 ]

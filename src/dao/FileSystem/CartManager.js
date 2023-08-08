@@ -1,4 +1,6 @@
 const fs = require('fs')
+const ProductManager = require('./ProductManager')
+const managerProd = new ProductManager('./src/products.json')
 
 class CartManager {
     constructor(path) {
@@ -8,6 +10,9 @@ class CartManager {
     getCarts () {
         return fs.promises.readFile(this.path, 'utf-8')
         .then((cartsString) => {
+            if(cartsString === '') {
+                return []
+            }
             const carritos = JSON.parse(cartsString)
             return carritos
         })
@@ -63,6 +68,10 @@ class CartManager {
             console.log('Error al actualizar el carrito')
             return error
         })
+    }
+
+    addProductToCart(cid, pid) {
+        
     }
 
 }

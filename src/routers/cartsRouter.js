@@ -1,12 +1,13 @@
 const { Router } = require('express')
 const cartsRouter = Router()
 
-const CartManager = require('../managers/CartManager')
-const manager = new CartManager('./src/carts.json')
+
+const CartManager = require('../dao/FileSystem/CartManager')
+const managerCart = new CartManager('./src/carts.json')
 
 cartsRouter.get('/', async (req, res) => {
     try {
-        const carts = await manager.getCarts()
+        const carts = await managerCart.getCarts()
         return res.send(carts)
     }
     catch (err) {
@@ -17,7 +18,7 @@ cartsRouter.get('/', async (req, res) => {
 cartsRouter.post('/', async (req, res) => {
     try {
         const cart = req.body
-        await manager.addCart(cart)
+        await managerCart.addCart(cart)
 
         return res.status(201).json({ status: 'success', message: 'Carrito agregado exitosamente' })
         
@@ -30,7 +31,7 @@ cartsRouter.post('/', async (req, res) => {
 cartsRouter.get('/:cid', async (req, res) => {
     try {
         const cartId = parseInt(req.params.cid)
-        const cartFilteredById = await manager.getCartById(cartId)
+        const cartFilteredById = await managerCart.getCartById(cartId)
 
         if(!cartFilteredById) {
             res.status(404).send('El carrito no existe')
@@ -48,13 +49,13 @@ cartsRouter.post('/:cid/product/:pid', async (req, res) => {
         const cartId = parseInt(req.params.cid)
         const prodId = parseInt(req.params.pid)
 
-        const cartFilteredById = await manager.getCartById(cartId)
+        const cartFilteredById = await managerCart.getCartById(cartId)
 
         if(!cartFilteredById) {
             res.status(404).send('El carrito no existe')
         }
         
-        const productFilteredById = await manager.getCartById(prodId)
+        const productFilteredById = await managerCart.getCartById(prodId)
         
         if(!productFilteredById) {
             return res.status(404).send('El producto no existe')
@@ -76,7 +77,7 @@ cartsRouter.post('/:cid/product/:pid', async (req, res) => {
         // }
         // cart.product.push(prod)
 
-        await manager.updateCart(cartId, cartFilteredById)
+        await managerCart.updateCart(cartId, cartFilteredById)
 
         return res.status(201).json(cartFilteredById)
     }

@@ -1,5 +1,5 @@
 const { Router } = require('express')
-const ProductManager = require('../managers/ProductManager')
+const ProductManager = require('../dao/DB/ProductManagerMongo')
 
 
 const productsRouterFn = (io) => {
@@ -8,7 +8,7 @@ const productsRouterFn = (io) => {
 
     productsRouter.get('/', async (req, res) => {
         try {
-            const products = await manager.getProducts()
+            const products = await manager.getAllProducts()
             const limit = req.query.limit
     
             if(!limit) {
@@ -25,13 +25,13 @@ const productsRouterFn = (io) => {
     
     productsRouter.get('/:pid', async (req, res) => {
         try {
-            const productId = parseInt(req.params.pid)
-            const productFilteredById = await manager.getProductById(productId)
+            const pid = req.params.pid
+            const productFilteredById = await manager.getProductById(pid)
             
             if(!productFilteredById) {
                 return res.status(404).send('El producto no existe')
             } else {
-                return res.status(200).send(productFilteredById)
+                return res.status(200).json(productFilteredById)
             }
         }
         catch (err) {
@@ -41,8 +41,8 @@ const productsRouterFn = (io) => {
     
     productsRouter.post('/', async (req, res) => {
         try {
-            const newProduct = req.body
-            await manager.addProduct(newProduct)
+            const body = req.body
+            await manager.addProduct(body)
         
             return res.status(201).json({ status: 'success', message: 'Producto agregado exitosamente' })
         }
@@ -53,17 +53,16 @@ const productsRouterFn = (io) => {
     
     productsRouter.put('/:pid', async (req, res) => {
         try {
-            const data = req.body
-            const productId = parseInt(req.params.pid)
-            const productFilteredById = await manager.getProductById(productId)
+            const body = req.body
+            const pid = req.params.pid
+            const product = await manager.updateProduct(pid, body)
             
-            if(!productFilteredById) {
-                return res.status(404).json({
-                    error: 'Product not found'
-                })
-            }
-            await manager.updateProduct(productId, data)
-            return res.status(200).json('El producto ha sido actualizado correctamente')
+            // if(!product) {
+            //     return res.status(404).json({
+            //         error: 'Product not found'
+            //     })
+            // }
+            return res.status(200).json( { status: 'success', message: 'El producto ha sido actualizado correctamente', product } )
         }
         catch (err) {
             console.log(err)
@@ -71,21 +70,23 @@ const productsRouterFn = (io) => {
     })
     
     productsRouter.delete('/:pid', async (req, res) => {
+        const pid = req.params.pid
         try {
-            const productId = parseInt(req.params.pid)
-            const productFilteredById = await manager.getProductById(productId)
+            // if(!productFilteredById) {
+            //     return res.status(404).json({
+            //         error: 'Product not found'
+            //     })
+            // }
             
-            if(!productFilteredById) {
-                return res.status(404).json({
-                    error: 'Product not found'
-                })
-            }
-                await manager.deleteProduct(productId)
-                return res.status(204).json({})
+            const product = await manager.deleteProduct(pid)
+            
+            return res.status(200).json({ status: 'success', message: 'El producto ha sido borrado correctamente', product })
     
         }
-        catch (err) {
-            console.log(err)
+        catch (e) {
+            return res.status(404).json({
+                message: e.message
+                })
         }
     })
 
