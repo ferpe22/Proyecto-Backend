@@ -1,13 +1,14 @@
 const { Router } = require('express')
-const ProductManager = require('../dao/FileSystem/ProductManager')
+const ProductManager = require('../dao/DB/ProductManagerMongo')
+//const ProductManager = require('../dao/FileSystem/ProductManager')
 
 const viewsRouterFn = (io) => {
     const viewsRouter = Router()
-    const manager = new ProductManager('./src/products.json', io)
+    const manager = new ProductManager(io)
 
     viewsRouter.get('/home', async (req, res) => {
         try{
-            const products = await manager.getProducts()
+            const products = await manager.getAllProducts()
             const limit = req.query.limit
             
             if(products.length === 0) {
@@ -27,7 +28,7 @@ const viewsRouterFn = (io) => {
     
     viewsRouter.get('/realTimeProducts', async (req, res) => {
         try{
-            const products = await manager.getProducts()
+            const products = await manager.getAllProducts()
             const limit = req.query.limit
             
             if(products.length === 0) {
@@ -47,8 +48,8 @@ const viewsRouterFn = (io) => {
 
     viewsRouter.post('/realTimeProducts', async (req, res) => {
         try {
-            const newProduct = req.body
-            await manager.addProduct(newProduct)
+            const body = req.body
+            await manager.addProduct(body)
 
             io.emit('newProduct', JSON.stringify(nvoProd))
         }

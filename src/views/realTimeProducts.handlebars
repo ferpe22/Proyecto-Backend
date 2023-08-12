@@ -17,7 +17,7 @@
     </tr>
     {{#each products}}
         <tr>
-            <td>{{this.id}}</td>
+            <td>{{this._id}}</td>
             <td>{{this.title}}</td>
             <td>{{this.description}}</td>
             <td>{{this.code}}</td>
@@ -25,7 +25,7 @@
             <td>{{this.stock}}</td>
             <td>{{this.price}}</td>
             <td>{{this.status}}</td>
-            <td><button class="deleteBtn" id="deleteBtn_{{this.id}}" onclick="deleteProduct({{this.id}})">Borrar</button></td>
+            <td><button class="deleteBtn" id="deleteBtn_{{this._id}}" onclick="deleteProduct({{this._id}})">Borrar</button></td>
         </tr>
     {{/each}}
 </table>
@@ -62,7 +62,7 @@
                 <label for="category" class="form-label">Status:</label>
                 <input type="text" class="form-control" id="statusInput" placeholder="True o False">
             </div>
-            <input type="submit" value="Enviar" class="btn btn-primary"></input>
+            <input type="submit" value="Add Product" class="btn btn-primary"></input>
         </form>
     </div>
 </div>

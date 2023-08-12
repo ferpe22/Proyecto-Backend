@@ -118,5 +118,15 @@
     "category": "Tecnologia",
     "status": "true",
     "id": 11
+  },
+  {
+    "title": "Notebook",
+    "description": "HP",
+    "price": "150000",
+    "code": "VT-100",
+    "stock": "2",
+    "category": "Tecnologia",
+    "status": "true",
+    "id": 12
   }
 ]

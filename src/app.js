@@ -4,7 +4,8 @@ const cartsRouter = require('./routers/cartsRouter') //Requiero el router de car
 const viewsRouterFn = require('./routers/viewsRouter')
 const handlebars = require('express-handlebars') //Requiero handlebars, el motor de plantillas
 const socketServer = require('./utils/io')
-const ProductManager = require('./dao/FileSystem/ProductManager')
+//const ProductManager = require('./dao/FileSystem/ProductManager')
+const ProductManager = require('./dao/DB/ProductManagerMongo')
 const mongoose = require('mongoose')
 
 const app = express() //Creacion de aplicacion express
@@ -37,14 +38,16 @@ const httpServer = app.listen (PORT, () => console.log(`Servidor corriendo en el
 
 
 const io = socketServer(httpServer)
-const manager = new ProductManager('./src/products.json', io)
+//const manager = new ProductManager('./src/products.json', io)
 
+//SOCKETS
 io.on('connection', (socket) => {
     console.log('Nuevo cliente conectado!', socket.id)
 
     socket.on('AddProduct', async (data) => {
         console.log(data)
         const newProduct = JSON.parse(data)
+        console.log(newProduct)
         try {
             await manager.addProduct(newProduct)
             io.emit('nuevoProducto', JSON.stringify(newProduct))

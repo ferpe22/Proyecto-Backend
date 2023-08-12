@@ -7,7 +7,7 @@ class ProductManager {
     }
 
     //Visualizar el array de productos
-    getProducts () {
+    getAllProducts () {
         return fs.promises.readFile(this.path, 'utf-8')
         .then((productosString)=> {
             const productos = JSON.parse(productosString)
@@ -33,7 +33,7 @@ class ProductManager {
             status: data.status,
         }
 
-        return this.getProducts()
+        return this.getAllProducts()
             .then(products => { 
                 //Validacion de campos obligatorios
                 if(

@@ -1,10 +1,11 @@
 const { Router } = require('express')
 const ProductManager = require('../dao/DB/ProductManagerMongo')
+//const ProductManager = require('../dao/FileSystem/ProductManager')
 
 
 const productsRouterFn = (io) => {
     const productsRouter = Router()
-    const manager = new ProductManager('./src/products.json', io)
+    const manager = new ProductManager(io)
 
     productsRouter.get('/', async (req, res) => {
         try {

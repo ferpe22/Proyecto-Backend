@@ -1,33 +1,76 @@
 const productModel = require('../models/productModel')
 
 class ProductManager {
-    constructor() {
+    constructor(io) {
         this.model = productModel
+        this.io = io
     }
 
     async getAllProducts() {
-        const products = await this.model.find()
-        return products.map(p => p.toObject())
+        try {
+            const products = await this.model.find()
+            return products.map(p => p.toObject())
+        } catch (error) {
+            throw new error
+        }
 
     }
 
     async getProductById(id) {
-        return this.model.findById(id)
+        try {
+            const product = await this.model.findById(id)
+            if(!product) {
+                throw new Error('El producto no se encuenta en el inventario')
+            }
+            return product
+        } catch (error) {
+            throw error
+        }
     }
 
     async addProduct(body) {
-        return this.model.create({
-            title: body.title,
-            description: body.description,
-            price: body.price,
-            thumbnail: body.thumbnail,
-            code: body.code,
-            stock: body.stock,
-            category: body.category,
-            status: body.status
-        })
+        try {
+            if(
+                body.title === '' ||
+                body.description === '' ||
+                body.price=== '' ||
+                body.thumbnail === '' ||
+                body.code === '' ||
+                body.stock === '' ||
+                body.category === '' ||
+                body.status === '' ||
+                body.status === undefinded ||
+                body.status === null
+            ) {
+            throw new Error('Todos los capos son obligatorios')
+            }
+            //Validacion que no se repita el "Code" de los productos
+            const repetido = await productModel.findeOne({ code: body.code });
+            if (repetido) {
+                throw new Error(`Ya existe un producto con el code '${body.code}'`)
+            }
 
+            const nvoProd = this.model.create(
+                {
+                    title: body.title,
+                    description: body.description,
+                    price: body.price,
+                    thumbnail: body.thumbnail,
+                    code: body.code,
+                    stock: body.stock,
+                    category: body.category,
+                    status: body.status
+                })
+
+                if(this.io) {
+                    this.io.emit('nuevoProducto', JSON.stringify(nvoProd))
+                }
+
+            } catch (error) {
+                throw error
+            }
     }
+
 
     async updateProduct(id, body) {
         const product = await this.getProductById(id)
