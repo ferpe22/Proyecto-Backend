@@ -38,19 +38,17 @@ class ProductManager {
                 body.code === '' ||
                 body.stock === '' ||
                 body.category === '' ||
-                body.status === '' ||
-                body.status === undefinded ||
-                body.status === null
+                body.status === ''
             ) {
-            throw new Error('Todos los capos son obligatorios')
+            throw new Error('Todos los campos son obligatorios')
             }
             //Validacion que no se repita el "Code" de los productos
-            const repetido = await productModel.findeOne({ code: body.code });
+            const repetido = await productModel.findOne({ code: body.code });
             if (repetido) {
                 throw new Error(`Ya existe un producto con el code '${body.code}'`)
             }
 
-            const nvoProd = this.model.create(
+            const nvoProd = await this.model.create(
                 {
                     title: body.title,
                     description: body.description,

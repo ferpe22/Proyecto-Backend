@@ -60,6 +60,15 @@ const viewsRouterFn = (io) => {
         return res.render.status(201).json(newProduct)
     })
 
+    viewsRouter.get('/chat', (req, res) => {
+        try {
+            return res.render('chat', { title: 'Chat' })
+
+        } catch (error) {
+            console.log(error)
+        }
+    })
+
     return viewsRouter
 }
 

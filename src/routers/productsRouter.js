@@ -5,11 +5,11 @@ const ProductManager = require('../dao/DB/ProductManagerMongo')
 
 const productsRouterFn = (io) => {
     const productsRouter = Router()
-    const manager = new ProductManager(io)
+    const productManager = new ProductManager(io)
 
     productsRouter.get('/', async (req, res) => {
         try {
-            const products = await manager.getAllProducts()
+            const products = await productManager.getAllProducts()
             const limit = req.query.limit
     
             if(!limit) {
@@ -27,7 +27,7 @@ const productsRouterFn = (io) => {
     productsRouter.get('/:pid', async (req, res) => {
         try {
             const pid = req.params.pid
-            const productFilteredById = await manager.getProductById(pid)
+            const productFilteredById = await productManager.getProductById(pid)
             
             if(!productFilteredById) {
                 return res.status(404).send('El producto no existe')
@@ -43,7 +43,7 @@ const productsRouterFn = (io) => {
     productsRouter.post('/', async (req, res) => {
         try {
             const body = req.body
-            await manager.addProduct(body)
+            await productManager.addProduct(body)
         
             return res.status(201).json({ status: 'success', message: 'Producto agregado exitosamente' })
         }
@@ -56,7 +56,7 @@ const productsRouterFn = (io) => {
         try {
             const body = req.body
             const pid = req.params.pid
-            const product = await manager.updateProduct(pid, body)
+            const product = await productManager.updateProduct(pid, body)
             
             // if(!product) {
             //     return res.status(404).json({
@@ -79,7 +79,7 @@ const productsRouterFn = (io) => {
             //     })
             // }
             
-            const product = await manager.deleteProduct(pid)
+            const product = await productManager.deleteProduct(pid)
             
             return res.status(200).json({ status: 'success', message: 'El producto ha sido borrado correctamente', product })
     
