@@ -51,13 +51,14 @@ const messageManager = new MessageManager(io)
 io.on('connection', (socket) => {
     console.log('Nuevo cliente conectado!', socket.id)
 
+    //Recibo del front la info del nuevo producto, lo agregao a DB Mongo y emito la info de este al front nuevamente
     socket.on('AddProduct', async (data) => {
         console.log(data)
         const newProduct = JSON.parse(data)
         console.log(newProduct)
         try {
             await productManager.addProduct(newProduct)
-            io.emit('nuevoProducto', JSON.stringify(newProduct))
+            io.emit('newProductToAdd', JSON.stringify(newProduct))
         }
         catch(error) {
             io.emit('notification', 'Error al guardar el producto')

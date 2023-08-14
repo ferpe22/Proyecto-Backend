@@ -11,6 +11,7 @@ const categoryInput = document.getElementById('categoryInput')
 const statusInput= document.getElementById('statusInput')
 const formBtn = document.getElementById('formBtn')
 
+//Envias el form y emitis un mensaje al Back con la info del producto agregado
 formBtn.addEventListener('submit', (event) => {
     event.preventDefault()
 
@@ -35,7 +36,7 @@ const deleteProduct = (id) => {
     })
 }
 
-socket.on('nuevoProducto', (data) => {
+socket.on('newProductToAdd', (data) => {
     const product = JSON.parse(data)
 
     const productHTML = `

@@ -1,88 +1,63 @@
 const { Router } = require('express')
 const cartsRouter = Router()
-
-
-const CartManager = require('../dao/FileSystem/CartManager')
-const managerCart = new CartManager('./src/carts.json')
+const CartManager = require('../dao/DB/CartManagerMongo')
+//const cartManager = new CartManager('./src/carts.json')
+const cartManager = new CartManager()
 
 cartsRouter.get('/', async (req, res) => {
     try {
-        const carts = await managerCart.getCarts()
-        return res.send(carts)
+        const carts = await cartManager.getAllCarts()
+        // if(carts.lenght === 0) {
+        //     return res.status(404).send('No hay carritos para mostrar')
+        // }
+        return res.status(200).json({ status: 'success', payload: carts})
     }
-    catch (err) {
-        console.log(err)
+    catch (error) {
+        return res.status(500).json({ error: 'Error al obtener los carritos', message: error.message })
+    }
+})
+
+cartsRouter.get('/:cid', async (req, res) => {
+    const cid = req.params.cid
+    try {
+        const cart = await cartManager.getCartById(cid)
+        return res.status(200).json({ status: 'success', payload: cart})
+    }
+    catch (error) {
+        return res.status(500).json({ error: 'Error al obtener los carritos', message: error.message })
     }
 })
 
 cartsRouter.post('/', async (req, res) => {
     try {
-        const cart = req.body
-        await managerCart.addCart(cart)
+        await cartManager.addCart()
 
         return res.status(201).json({ status: 'success', message: 'Carrito agregado exitosamente' })
-        
     }
     catch (error) {
         return res.status(500).json({ error: 'Error al agregar el carrito', message: error.message })
     }
 })
 
-cartsRouter.get('/:cid', async (req, res) => {
-    try {
-        const cartId = parseInt(req.params.cid)
-        const cartFilteredById = await managerCart.getCartById(cartId)
-
-        if(!cartFilteredById) {
-            res.status(404).send('El carrito no existe')
-        }
-        return res.status(201).json(cartFilteredById)
-
-    }
-    catch (err) {
-        console.log(err)
-    }
-})
-
 cartsRouter.post('/:cid/product/:pid', async (req, res) => {
+    const cid = req.params.cid
+    const pid = req.params.pid
+    
     try {
-        const cartId = parseInt(req.params.cid)
-        const prodId = parseInt(req.params.pid)
+        await cartManager.addProductToCart(cid, pid)
 
-        const cartFilteredById = await managerCart.getCartById(cartId)
-
-        if(!cartFilteredById) {
-            res.status(404).send('El carrito no existe')
-        }
-        
-        const productFilteredById = await managerCart.getCartById(prodId)
-        
-        if(!productFilteredById) {
-            return res.status(404).send('El producto no existe')
-        }
-        const prodEnCart = cartFilteredById.products.find( e => e.product === prodId)
-
-        if(!prodEnCart){
-            const newProductoInCart = {
-                product: prodId,
-                quantity: 1
-            }
-            cartFilteredById.products.push(newProductoInCart)
-        } else {
-            prodEnCart.quantity++
-        }
-        
-        // const prod = {
-        //     id: prod.id 
-        // }
-        // cart.product.push(prod)
-
-        await managerCart.updateCart(cartId, cartFilteredById)
-
-        return res.status(201).json(cartFilteredById)
+        return res.status(201).json({ status: 'success', message: 'Producto agregado al carrito exitosamente' })
     }
-    catch (err) {
-        console.log(err)
+    catch (error) {
+        if (error.message === 'El producto no se encuentra en el inventario') {
+            return res.status(404).json({ error: 'Product Not Found', message: 'El producto que intentas agregar no se encuentra en inventario' })
+        }
+
+        if (error.message === 'No se encuentra el carrito') {
+            return res.status(404).json({ error: 'Cart Not Found', message: 'No se pueda ingresar productos a un carrito inexistente' })
+        }
+
+        return res.status(500).json({ error: 'Error al guardar el producto en el carrito', message: error.message })
     }
 })
 

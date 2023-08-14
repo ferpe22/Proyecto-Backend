@@ -4,11 +4,11 @@ const ProductManager = require('../dao/DB/ProductManagerMongo')
 
 const viewsRouterFn = (io) => {
     const viewsRouter = Router()
-    const manager = new ProductManager(io)
+    const productManager = new ProductManager(io)
 
     viewsRouter.get('/home', async (req, res) => {
         try{
-            const products = await manager.getAllProducts()
+            const products = await productManager.getAllProducts()
             const limit = req.query.limit
             
             if(products.length === 0) {
@@ -28,7 +28,7 @@ const viewsRouterFn = (io) => {
     
     viewsRouter.get('/realTimeProducts', async (req, res) => {
         try{
-            const products = await manager.getAllProducts()
+            const products = await productManager.getAllProducts()
             const limit = req.query.limit
             
             if(products.length === 0) {
@@ -46,19 +46,19 @@ const viewsRouterFn = (io) => {
         }
     })
 
-    viewsRouter.post('/realTimeProducts', async (req, res) => {
-        try {
-            const body = req.body
-            await manager.addProduct(body)
+    // viewsRouter.post('/realTimeProducts', async (req, res) => {
+    //     try {
+    //         const body = req.body
+    //         await productManager.addProduct(body)
 
-            io.emit('newProduct', JSON.stringify(nvoProd))
-        }
-        catch(error) {
-            return res.send( { error: 'Error al guardar el producto' } )
-        }
+    //         io.emit('newProduct', JSON.stringify(nvoProd))
+    //     }
+    //     catch(error) {
+    //         return res.send( { error: 'Error al guardar el producto' } )
+    //     }
         
-        return res.render.status(201).json(newProduct)
-    })
+    //     return res.render.status(201).json(newProduct)
+    // })
 
     viewsRouter.get('/chat', (req, res) => {
         try {
