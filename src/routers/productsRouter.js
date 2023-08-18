@@ -10,7 +10,9 @@ const productsRouterFn = (io) => {
     productsRouter.get('/', async (req, res) => {
         try {
             const products = await productManager.getAllProducts()
-            const limit = req.query.limit
+            const limit = req.query.limit || 10
+            const page = req.query.page || 1
+            
     
             if(!limit) {
                 return res.status(200).send(products)

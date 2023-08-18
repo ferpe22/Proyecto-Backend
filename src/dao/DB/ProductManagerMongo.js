@@ -9,7 +9,9 @@ class ProductManager {
     async getAllProducts() {
         try {
             const products = await this.model.find()
+            //const products = await this.model.paginate({}, { limit: 5, page: 1, sort: { title: -1 } })
             return products.map(p => p.toObject())
+
         } catch (error) {
             throw new error
         }

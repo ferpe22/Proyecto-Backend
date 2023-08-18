@@ -1,0 +1,35 @@
+
+<div class="container">
+    <h2>Vista del Cart</h2>
+    <p> </p>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-md justify-middle">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col" class="text-center">ID</th>
+                <th scope="col" class="text-center">Titulo</th>
+                <th scope="col" class="text-center">Descripción</th>
+                <th scope="col" class="text-center">Codigo</th>
+                <th scope="col" class="text-center">Categoria</th>
+                <th scope="col" class="text-center">Stock</th>
+                <th scope="col" class="text-center">Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each products}}
+            <tr>
+                <td scope="row" class="text-center">{{this._id}}</td>
+                <td class="text-center">{{this.title}}</td>
+                <td class="text-center">{{this.description}}</td>
+                <td class="text-center">{{this.code}}</td>
+                <td class="text-center">{{this.category}}</td>
+                <td class="text-center">{{this.stock}}</td>
+                <td class="text-center">{{this.price}}</td>
+                
+            </tr>
+            {{/each}}
+        </tbody>
+        </table>
+    </div>
+
+</div>

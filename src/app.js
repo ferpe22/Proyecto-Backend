@@ -1,6 +1,6 @@
 const express = require('express') //Requiero express
 const productsRouterFn = require('./routers/productsRouter') //Requiero el router de productos
-const cartsRouter = require('./routers/cartsRouter') //Requiero el router de carritos
+const cartsRouterFn = require('./routers/cartsRouter') //Requiero el router de carritos
 const viewsRouterFn = require('./routers/viewsRouter')
 const handlebars = require('express-handlebars') //Requiero handlebars, el motor de plantillas
 const socketServer = require('./utils/io')
@@ -117,6 +117,7 @@ io.on('connection', (socket) => {
 //ruta base de los routers
 const productsRouter = productsRouterFn(io)
 app.use('/api/products', productsRouter)
+const cartsRouter = cartsRouterFn(io)
 app.use('/api/carts', cartsRouter)
 const viewsRouter = viewsRouterFn(io)
 app.use('/', viewsRouter)
