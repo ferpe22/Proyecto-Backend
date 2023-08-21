@@ -9,22 +9,42 @@ const viewsRouterFn = (io) => {
     const cartManager = new CartManager(io)
 
     viewsRouter.get('/home', async (req, res) => {
+        const filters = {}
+        const { page= 1, limit= 5, sort, category, availability } = req.query
+        const sortOptions = sort === 'asc' ? { price: 1 } : sort === 'desc' ? { price: -1 } : {};
+        const availabilityOptions = availability === 'available' ? true : availability === 'unavailable' ? false : undefined;
+        const query = {
+            page: parseInt(page),
+            limit: parseInt(limit),
+            sort: sortOptions,
+        }
+        
         try{
-            const products = await productManager.getAllProducts()
-            const limit = req.query.limit
-            
-            if(products.length === 0) {
-                return res.send('No hay productos en la base de datos')
-            }
-            if(!limit) {
-                return res.render('home', { title: 'Home', products: products, isEmpty: false })
+            if (category) {
+                filters.category = category
             }
 
-            const limitedProd = products.slice(0, parseInt(limit))
-            return res.render('home', { title: 'Home', products: limitedProd } )
+            if (availability) {
+                filters.status = availabilityOptions;
+            }
+            
+            const productsDB = await productManager.getAllProducts(filters, query)
+            const products = productsDB.docs.map(p => p.toObject())
+            
+            if(products.length === 0) {
+                return res.render('home', { title: 'Home', products: products, isEmpty: true })
+            }
+
+            return res.render('home', { 
+                title: 'Home', products: products, productsDB: productsDB, isEmpty: false,
+                generatePaginationLink: (page) => {
+                    const newQuery = { ...req.query, ...filters, page: page };
+                    return '/home?' + new URLSearchParams(newQuery).toString();
+                }
+            })
         }
         catch (error) {
-            return res.send( { error: 'Error a cargar los productos' } )
+            return res.render( { title: 'Error', message: error.message } )
         }
     })
     
@@ -64,37 +84,64 @@ const viewsRouterFn = (io) => {
 
     //Visualizar todods los productos con su respectiva paginacion.
     viewsRouter.get('/products', async (req, res) => {
+        const filters = {}
+        const { page= 1, limit= 5, sort, category, availability } = req.query
+        const sortOptions = sort === 'asc' ? { price: 1 } : sort === 'desc' ? { price: -1 } : {};
+        const availabilityOptions = availability === 'available' ? true : availability === 'unavailable' ? false : undefined;
+        const query = {
+            page: parseInt(page),
+            limit: parseInt(limit),
+            sort: sortOptions,
+        }
+        
         try{
-            const products = await productManager.getAllProducts()
-            const limit = req.query.limit
-            
-            if(products.length === 0) {
-                return res.send('No hay productos en la base de datos')
-            }
-            if(!limit) {
-                return res.render('products', { title: 'Products', products: products, isEmpty: false })
+            if (category) {
+                filters.category = category
             }
 
-            const limitedProd = products.slice(0, parseInt(limit))
-            return res.render('products', { title: 'Products', products: limitedProd } )
+            if (availability) {
+                filters.status = availabilityOptions;
+            }
+            
+            const productsDB = await productManager.getAllProducts(filters, query)
+            const products = productsDB.docs.map(p => p.toObject())
+            
+            if(productsDB.docs.length === 0) {
+                return res.render('products', { title: 'Products', isEmpty: true })
+            }
+
+            return res.render('products', { 
+                title: 'Products', products: products, productsDB: productsDB, isEmpty: false,
+                generatePaginationLink: (page) => {
+                    const newQuery = { ...req.query, ...filters, page: page };
+                    return '/products?' + new URLSearchParams(newQuery).toString();
+                }
+            })
         }
         catch (error) {
-            return res.send( { error: 'Error a cargar los productos' } )
+            return res.render( { title: 'Error', message: error.message } )
         }
     })
 
     //Visualizar detalle de producto
     viewsRouter.get('/products/:pid', async (req, res) => {
-        
+        const pid = req.params.pid
+        try {
+            const product = await productManager.getProductById(pid)
+
+            return res.render('productDetail', { title: 'Product Detail', product: product })
+        } catch (error) {
+            return res.render( { title: 'Error', message: error.message } )
+        }
     })
     //visualizar el carrito especifico donde deberan estar SOLO los productos que pertenezcan a dicho carrito
     viewsRouter.get('/carts/:cid', async (req, res) => {
         const cid = req.params.cid
         try {
             const cart = await cartManager.getCartById(cid)
-            console.log(cart)
             const productsInCart = cart[0].products.map(p => p.toObject())
-            res.render('carts', { title: 'Carts', productsInCart })
+
+            res.render('carts', { title: 'Carts', productsInCart: productsInCart })
 
         } catch (error) {
             console.log(error)

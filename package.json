@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/ferpe22/Proyecto-Backend#readme",
   "dependencies": {
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-handlebars": "^7.0.7",
     "moment": "^2.29.4",

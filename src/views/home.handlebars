@@ -31,9 +31,13 @@
         </tbody>
         </table>
         <div class="container">
-            <a href="">Pagina anterior</a>
-            <p>Pagina xxx de xxx</p>
-            <a href="">Pagina siguiente</a>
+            {{#if productsDB.hasPrevPage}}
+            <a href="{{generatePaginationLink productsDB.prevPage}}">Pagina anterior</a>
+            {{/if}}
+            <p>Pagina {{productsDB.page}} de {{productsDB.totalPages}}</p>
+            {{#if productsDB.hasNextPage}}
+            <a href="{{generatePaginationLink productsDB.nextPage}}">Pagina siguiente</a>
+            {{/if}}
         </div>
     </div>
 </section>

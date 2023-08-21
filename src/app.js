@@ -8,6 +8,8 @@ const socketServer = require('./utils/io')
 const mongoose = require('mongoose')
 const ProductManager = require('./dao/DB/ProductManagerMongo')
 const MessageManager = require('./dao/DB/MessageManagerMongo')
+require('dotenv').config()
+const mongoDbPwd = process.env.MONGODB_PWD
 const moment = require('moment')
 require('moment/locale/es')
 moment.locale('es')
@@ -22,7 +24,7 @@ app.set('views', './src/views') //ubicacion de  las vistas
 app.set('view engine', 'handlebars') //indicamos que el motor
 
 //Configuarion de Mongoose
-const MONGODB_CONNECT = 'mongodb+srv://ferpereira22:franco15@cluster0.vkepnh1.mongodb.net/ecommerce?retryWrites=true&w=majority'
+const MONGODB_CONNECT = `mongodb+srv://ferpereira22:${mongoDbPwd}@cluster0.vkepnh1.mongodb.net/ecommerce?retryWrites=true&w=majority`
 mongoose.connect(MONGODB_CONNECT)
 .then(() => console.log('Conectado a MongoDB'))
 .catch((error) => console.log(error))

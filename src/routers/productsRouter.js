@@ -8,21 +8,52 @@ const productsRouterFn = (io) => {
     const productManager = new ProductManager(io)
 
     productsRouter.get('/', async (req, res) => {
-        try {
-            const products = await productManager.getAllProducts()
-            const limit = req.query.limit || 10
-            const page = req.query.page || 1
-            
-    
-            if(!limit) {
-                return res.status(200).send(products)
-            } else {
-                const limitedProd = products.slice(0, limit)
-                return res.status(200).send(limitedProd)
-            }
+        const filters = {}
+        const { page= 1, limit= 5, sort, category, availability } = req.query
+        const sortOptions = sort === 'asc' ? { price: 1 } : sort === 'desc' ? { price: -1 } : {};
+        const availabilityOptions = availability === 'available' ? true : availability === 'unavailable' ? false : undefined;
+        const query = {
+            page: parseInt(page),
+            limit: parseInt(limit),
+            sort: sortOptions,
         }
-        catch (err) {
-            console.log(err)
+        
+        try {
+            if (category) {
+                filters.category = category
+            }
+
+            if (availability) {
+                filters.status = availabilityOptions;
+            }
+            
+            const products = await productManager.getAllProducts(filters, query)
+
+            const generatePageLink = (page) => {
+                const newQuery = { ...req.query, ...filters, page: page };
+                //return `api/products?${new URLSearchParams(newQuery).toString()}`
+                return 'api/products?' + new URLSearchParams(newQuery).toString();
+            };
+            
+            return res.status(200).json({
+                status: 'success',
+                payload: products.doc,
+                totalPages: products.totalPages,
+                prevPage: products.prevPage,
+                nextPage: products.nextPage,
+                hasPrevPage: products.hasPrevPage,
+                hasNextPage: products.hasNextPage,
+                prevLink: products.hasPrevPage ? generatePageLink(products.prevPage) : null,
+                nextLink: products.hasNextPage ? generatePageLink(products.nextPage) : null
+            })
+
+        }
+        catch (error) {
+            if (error.message === 'No hay productos en el inventario') {
+                return res.status(404).json({ status: 'error', message: error.message })
+            }
+
+            return res.status(500).json({ status: 'error', error: 'Error al obtener los productos', message: error.message })
         }   
     })
     

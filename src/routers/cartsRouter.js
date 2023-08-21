@@ -95,7 +95,7 @@ const cartsRouterFn = (io) => {
     cartsRouter.put('/:cid', async (req, res) => {
         const cid = req.params.cid
         const newProducts = req.body.product
-        console.log(newProducts)
+
         
         try {
             await cartManager.UpdateArrayProductsInCart(cid, newProducts)

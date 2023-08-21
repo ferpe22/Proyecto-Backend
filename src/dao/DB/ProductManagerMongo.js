@@ -1,3 +1,4 @@
+const { query } = require('express')
 const productModel = require('../models/productModel')
 
 class ProductManager {
@@ -6,14 +7,19 @@ class ProductManager {
         this.io = io
     }
 
-    async getAllProducts() {
+    async getAllProducts(filters, query) {
         try {
-            const products = await this.model.find()
-            //const products = await this.model.paginate({}, { limit: 5, page: 1, sort: { title: -1 } })
-            return products.map(p => p.toObject())
+            //const products = await this.model.find()
+            const products = await this.model.paginate(filters, query)
+
+            if (products.length === 0) {
+                throw new Error('No hay productos en el inventario')
+            }
+            
+            return products
 
         } catch (error) {
-            throw new error
+            throw error
         }
 
     }
@@ -24,7 +30,7 @@ class ProductManager {
             if(!product) {
                 throw new Error('El producto no se encuenta en el inventario')
             }
-            return product
+            return product.toObject()
         } catch (error) {
             throw error
         }
