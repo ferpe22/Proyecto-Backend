@@ -8,6 +8,7 @@ const socketServer = require('./utils/io')
 const mongoose = require('mongoose')
 const ProductManager = require('./dao/DB/ProductManagerMongo')
 const MessageManager = require('./dao/DB/MessageManagerMongo')
+const CartManager = require('./dao/DB/CartManagerMongo')
 require('dotenv').config()
 const mongoDbPwd = process.env.MONGODB_PWD
 const moment = require('moment')
@@ -48,6 +49,7 @@ const io = socketServer(httpServer)
 
 const productManager = new ProductManager(io)
 const messageManager = new MessageManager(io)
+const cartManager = new CartManager(io)
 
 //SOCKETS
 io.on('connection', (socket) => {
@@ -113,6 +115,14 @@ io.on('connection', (socket) => {
         }
     })
 
+    socket.on('addProductToCart', async ({ cid, pid }) => {
+        try {
+            await cartManager.addProductToCart(cid, pid)
+            socket.emit('notification', { message: 'Producto agregado al carrito' })
+        } catch (error) {
+            socket.emit('notification', { message: error.message })
+        }
+    })
 })
 
 

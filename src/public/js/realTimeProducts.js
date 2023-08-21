@@ -1,7 +1,5 @@
 const socket = io()
 
-console.log(socket)
-
 const titleInput = document.getElementById('titleInput')
 const descriptionInput = document.getElementById('descriptionInput')
 const priceInput = document.getElementById('priceInput')
@@ -53,6 +51,7 @@ socket.on('newProductToAdd', (data) => {
     `
 
     const table = document.getElementById('productos')
+    console.log(table)
 
     table.innerHTML += productHTML
 })
