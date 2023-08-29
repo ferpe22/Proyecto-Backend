@@ -14,6 +14,10 @@ const mongoDbPwd = process.env.MONGODB_PWD
 const moment = require('moment')
 require('moment/locale/es')
 moment.locale('es')
+const cookieParser = require('cookie-parser')
+const session = require('express-session')
+const MongoStore = require('connect-mongo')
+const sessionRouterFn = require('./routers/sessionRouter')
 
 
 const app = express() //Creacion de aplicacion express
@@ -30,11 +34,24 @@ mongoose.connect(MONGODB_CONNECT)
 .then(() => console.log('Conectado a MongoDB'))
 .catch((error) => console.log(error))
 
+//Configuracion de session
+app.use(session({
+    store: MongoStore.create({
+        mongoUrl: MONGODB_CONNECT,
+        mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
+        ttl: 180
+    }),
+    secret: 'secretSession',
+    resave: true,
+    saveUninitialized: true,
+}))
 
 //Middlewares para manejar JSON y forms
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+//Middleware para gestionar las cookies
+app.use(cookieParser('secretkey'))
 
 //Middlewares de estaticos (configuracion la carpeta pubic de forma estatica)
 app.use(express.static(__dirname+ '/public'))
@@ -126,11 +143,13 @@ io.on('connection', (socket) => {
 })
 
 
-//ruta base de los routers
+//Ruta base de los routers
 const productsRouter = productsRouterFn(io)
 app.use('/api/products', productsRouter)
 const cartsRouter = cartsRouterFn(io)
 app.use('/api/carts', cartsRouter)
+const sessionRouter = sessionRouterFn(io)
+app.use('/api/sessions', sessionRouter)
 const viewsRouter = viewsRouterFn(io)
 app.use('/', viewsRouter)
 
