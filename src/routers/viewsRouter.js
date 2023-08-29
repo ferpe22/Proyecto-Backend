@@ -1,12 +1,22 @@
 const { Router } = require('express')
 const ProductManager = require('../dao/DB/ProductManagerMongo')
 const CartManager = require('../dao/DB/CartManagerMongo')
+const UserManager = require('../dao/DB/UserManagerMongo')
 //const ProductManager = require('../dao/FileSystem/ProductManager')
 
 const viewsRouterFn = (io) => {
     const viewsRouter = Router()
     const productManager = new ProductManager(io)
     const cartManager = new CartManager(io)
+    const userManager = new UserManager(io)
+
+    viewsRouter.get('/register', async (req, res) => {
+        return res.render('loginViews/register')
+    })
+
+    viewsRouter.get('/login', async (req, res) => {
+        return res.render('loginViews/login')
+    })
 
     viewsRouter.get('/home', async (req, res) => {
         const filters = {}
@@ -35,7 +45,7 @@ const viewsRouterFn = (io) => {
                 return res.render('home', { title: 'Home', products: products, isEmpty: true })
             }
 
-            return res.render('home', { 
+            return res.render('productsViews/home', { 
                 title: 'Home', products: products, productsDB: productsDB, isEmpty: false,
                 generatePaginationLink: (page) => {
                     const newQuery = { ...req.query, ...filters, page: page };
@@ -75,7 +85,7 @@ const viewsRouterFn = (io) => {
                 return res.render('home', { title: 'Home', products: products, isEmpty: true })
             }
 
-            return res.render('realTimeProducts', { 
+            return res.render('productsViews/realTimeProducts', { 
                 title: 'Real Time Products', products: products, productsDB: productsDB, isEmpty: false,
                 generatePaginationLink: (page) => {
                     const newQuery = { ...req.query, ...filters, page: page };
@@ -88,22 +98,11 @@ const viewsRouterFn = (io) => {
         }
     })
 
-    /*viewsRouter.post('/realTimeProducts', async (req, res) => {
-        try {
-            const body = req.body
-            await productManager.addProduct(body)
-
-            io.emit('newProduct', JSON.stringify(nvoProd))
-        }
-        catch(error) {
-            return res.send( { error: 'Error al guardar el producto' } )
-        }
-        
-        return res.render.status(201).json(newProduct)
-    })*/
 
     //Visualizar todods los productos con su respectiva paginacion.
     viewsRouter.get('/products', async (req, res) => {
+        const user = req.user
+        console.log(user) 
         const filters = {}
         const { page= 1, limit= 5, sort, category, availability } = req.query
         const sortOptions = sort === 'asc' ? { price: 1 } : sort === 'desc' ? { price: -1 } : {};
@@ -127,11 +126,11 @@ const viewsRouterFn = (io) => {
             const products = productsDB.docs.map(p => p.toObject())
             
             if(productsDB.docs.length === 0) {
-                return res.render('products', { title: 'Products', isEmpty: true })
+                return res.render('products', { title: 'Products', user: user })
             }
 
-            return res.render('products', { 
-                title: 'Products', products: products, productsDB: productsDB, isEmpty: false,
+            return res.render('productsViews/products', { 
+                title: 'Products', products: products, productsDB: productsDB, user: user,
                 generatePaginationLink: (page) => {
                     const newQuery = { ...req.query, ...filters, page: page };
                     return '/products?' + new URLSearchParams(newQuery).toString();
@@ -149,7 +148,7 @@ const viewsRouterFn = (io) => {
         try {
             const product = await productManager.getProductById(pid)
 
-            return res.render('productDetail', { title: 'Product Detail', product: product })
+            return res.render('productsViews/productDetail', { title: 'Product Detail', product: product })
         } catch (error) {
             return res.render( { title: 'Error', message: error.message } )
         }
@@ -161,7 +160,7 @@ const viewsRouterFn = (io) => {
             const cart = await cartManager.getCartById(cid)
             const productsInCart = cart[0].products.map(p => p.toObject())
 
-            res.render('carts', { title: 'Carts', productsInCart: productsInCart })
+            res.render('productsViews/carts', { title: 'Carts', productsInCart: productsInCart })
 
         } catch (error) {
             console.log(error)
