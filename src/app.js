@@ -14,10 +14,14 @@ const mongoDbPwd = process.env.MONGODB_PWD
 const moment = require('moment')
 require('moment/locale/es')
 moment.locale('es')
-const cookieParser = require('cookie-parser')
-const session = require('express-session')
 const MongoStore = require('connect-mongo')
 const sessionRouterFn = require('./routers/sessionRouter')
+const cookieParser = require('cookie-parser')
+const session = require('express-session')
+const passport = require('passport')
+const InitializePassport = require('./passport/passport.config')
+
+
 
 
 const app = express() //Creacion de aplicacion express
@@ -55,6 +59,11 @@ app.use(cookieParser('secretkey'))
 
 //Middlewares de estaticos (configuracion la carpeta pubic de forma estatica)
 app.use(express.static(__dirname+ '/public'))
+
+//Passport
+InitializePassport()
+app.use(passport.initialize())
+app.use(passport.session())
 
 
 //Se levanta los servidores HTTP y SOCKET para que ambos esten corriendo en el mismo puerto. Sobre e sevidor http esta corriendo el servidor socket

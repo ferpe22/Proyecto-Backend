@@ -3,7 +3,7 @@
 <section class="container">
     <h2>Login</h2>
     
-    <form action="/api/sessions/login" method="POST">
+    <form action="/api/sessions/" method="POST">
         <div class="col-md-6">
             <label for="email" class="form-label">Email:</label>
             <input type="text" class="form-control" name="email" id="email" required>
@@ -15,6 +15,17 @@
         <br>
         <input type="submit" class="btn btn-primary margin-top" value="Entrar">
     </form>
+    <br>
+    <div>
+        <h4>GITHUB</h4>
+        <p>Podes ingresar con tu cuenta de GitHub</p>
+        <a href="/api/sessions/github">Cliqueá aqui</a>
+    </div>
+    <br>
+    <br>
+    <div>
+        Te olvidaste la contraseña? Podes recuperarla <a href="/recoverypassword">aqui</a>
+    </div>
     <br>
     <div>
         Si aun no te registraste, puedes hacerlo <a href="/register">aqui</a>
