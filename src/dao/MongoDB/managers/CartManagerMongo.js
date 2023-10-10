@@ -1,5 +1,7 @@
 const cartModel = require('../models/cartModel')
 const productModel = require('../models/productModel')
+const TicketManager = require('./TicketManagerMongo')
+const ticketManager = new TicketManager()
 
 
 class CartManager {
@@ -24,7 +26,7 @@ class CartManager {
     async getCartById(id) {
         try {
             const cart = await this.model.find({_id: id})
-            console.log(cart)
+            
             if(!cart) {
                 throw new Error('No se pudo encontrar el carrito seleccionado')
             }
@@ -78,7 +80,7 @@ class CartManager {
         }
     }
 
-    async UpdateQtyProductInCart(cid, pid, quantity) {
+    async updateQtyProductInCart(cid, pid, quantity) {
         try {
             const cart = await this.model.findById(cid)
             const product = await productModel.findById(pid)
@@ -106,7 +108,7 @@ class CartManager {
         }
     }
     
-    async UpdateArrayProductsInCart(cid, newProducts) {
+    async updateArrayProductsInCart(cid, newProducts) {
         try{
             const cart = await this.model.findById(cid)
             const products = await productModel.find()
@@ -217,6 +219,22 @@ class CartManager {
         } catch (error) {
             throw error
         }
+    }
+
+    async finishPurchase(data) {
+      try {
+        const newOrder = await ticketManager.createOrder({
+          amount: data.amount,
+          purchaser: data.purchaser
+        })
+        return {
+          purchaser: newOrder.purchaser,
+          amount: newOrder.amount,
+          prodWithoutStock: newOrder.prodWithoutStock
+        }
+      } catch (error) {
+        throw error
+      }
     }
 }
 
