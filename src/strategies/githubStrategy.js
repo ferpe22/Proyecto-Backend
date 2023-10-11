@@ -9,9 +9,9 @@ require('dotenv').config()
 
 
 const githubStrategy = new GitHubSt({
-  clientID: process.env.GITHUB_CLIENT_ID,
-  clientSecret: process.env.GITHUB_CLIENT_SECRET,
-  callbackURL: 'http://localhost:8080/api/sessions/github-callback'
+  clientID: `${process.env.clientID}`,
+  clientSecret: `${process.env.clientSecret}`,
+  callbackURL: `${process.env.callbackURL}`,
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     let user = await userManager.getUserByUsername(profile.username)

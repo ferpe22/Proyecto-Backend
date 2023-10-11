@@ -31,7 +31,9 @@ class UserManager {
     async getUserByEmail(email) {
         try{
             const user = await this.model.findOne({ email: email })
+
             return user
+
         } catch (error) {
             return error
         }

@@ -80,13 +80,14 @@ class ProductsController {
 
   async addProduct(req, res) {
     const newProduct = req.body
-
+    
     try {
       await this.service.addProduct(newProduct)
 
       return res.status(201).send({ status: 'success', message: 'Producto agregado al inventario exitosamente' })
 
     } catch (error) {
+      console.log(error)
       return res.status(500).send({ status: 'Error', error: 'Error al agregar el producto', message: error.message })
     }
   }

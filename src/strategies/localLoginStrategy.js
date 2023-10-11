@@ -2,7 +2,8 @@ const passportLocal = require('passport-local')
 const LocalStrategy = passportLocal.Strategy
 const UserManager = require('../dao/MongoDB/managers/UserManagerMongo')
 const userManager = new UserManager()
-const { isValidPassword } = require('../utils/jwt')
+const { isValidPassword } = require('../utils/passwordHash')
+const { generateToken } = require('../utils/jwt')
 
 const localLoginStrategy = new LocalStrategy(
   { usernameField: 'email' },

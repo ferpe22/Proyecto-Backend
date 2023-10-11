@@ -63,12 +63,20 @@ const viewsRouterFn = (io) => {
       }
   })
 
-  viewsRouter.get('/', isAuthorized, async (req, res) => {
+  viewsRouter.get('/login', isAuthorized, async (req, res) => {
       try {
           return res.render('loginViews/login', { locals: { title: 'Login'} })
       } catch (error) {
           return res.render( { title: 'Error', message: error.message } )
       }
+  })
+
+  viewsRouter.post('login', isAuthorized, async (req, res) => {
+    try {
+      return res.redirect('/profile')
+    } catch (error) {
+      return res.render( { title: 'Error', message: error.message } )
+    }
   })
 
   viewsRouter.get('/profile', passportCall('jwt'), authorizationMiddleware('USER', 'ADMIN') , async (req, res) => {

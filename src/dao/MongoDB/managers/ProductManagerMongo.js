@@ -40,11 +40,8 @@ class ProductManager {
 
   async getProductByCode(code) {
     try {
-        const product = await this.model.findOne({ code })
-        if(!product) {
-            throw new Error('El producto no se encuentra en el inventario')
-        }
-        //return product.toObject()
+        const product = await this.model.findOne({ code: code });
+
         return product
     } catch (error) {
         throw error

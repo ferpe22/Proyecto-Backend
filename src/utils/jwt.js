@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 const settings = require('../commands/command')
-const JWT_KEY = settings.jwtKey
+const JWT_KEY = process.env.JWT_KEY
 
 const generateToken = (payload) => {
   const token = jwt.sign(payload, JWT_KEY, { expiresIn: '24h' })

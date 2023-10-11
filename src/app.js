@@ -15,7 +15,8 @@ require('dotenv').config()
 const moment = require('moment')
 require('moment/locale/es')
 moment.locale('es')
-const MongoStore = require('connect-mongo')
+const MongoDb = require('./dao/MongoDB/MongoDB')
+//const MongoStore = require('connect-mongo')
 
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
@@ -28,6 +29,7 @@ const path = require('path')
 
 const app = express() //Creacion de aplicacion express
 
+MongoDb.getConnection()
 
 //Configuraicon de handlebars
 app.engine('handlebars', handlebars.engine()) //inicializar el motor

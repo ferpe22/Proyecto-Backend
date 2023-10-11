@@ -6,7 +6,7 @@ const isAuthorized = (req, res, next) => {
   return next()
 }
 
-const authorizationMiddleware = (req, res, next) => {
+const authorizationMiddleware = (roles) => {
   return (req, res, next) => {
     const contentType = req.headers['content-type']
 

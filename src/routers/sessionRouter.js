@@ -29,7 +29,7 @@ const sessionRouterFn = (io) => {
     sessionRouter.get('/github-callback', passport.authenticate('github', { session: false }), (req, res) => {
       const token = req.user.token
 
-      return res.cookie('authTokenCookie', token, { maxAge: 60*60*1000 }).redirect('/home')
+      return res.cookie('authTokenCookie', token, { maxAge: 60*60*1000 }).redirect('/profile')
     })
 
     sessionRouter.post('/register', passportCall('register'), async (req, res) => {
@@ -47,7 +47,7 @@ const sessionRouterFn = (io) => {
       const user = req.user
 
       try {
-        return res.cookie('authTokenCookie', token, { maxAge: 60*60*1000 }).status(200).json({ user })
+        return res.cookie('authTokenCookie', token, { maxAge: 60*60*1000 }).status(201).json({ user })
       } catch (error) {
         return res.status(500).send( { title: 'Error al iniciar sesión', message: error.message } )
       }

@@ -12,7 +12,7 @@ const headerExtractor = (req) => {
 const jwtStrategy = new JWTStrategy({
 
   jwtFromRequest: extractJWT.fromExtractors([headerExtractor]),
-  secretOrKey: JWT_KEY
+  secretOrKey: `${JWT_KEY}`
 }, (jwtPayload, done) => {
     try {
         done(null, jwtPayload)
