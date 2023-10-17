@@ -16,13 +16,16 @@ const localRegisterStrategy = new LocalStrategy({
 
       if (user) {
           return done(null, false, { message: 'El usuario ya existe' })
-      } else if (!name || !lastname || !email || !age || !password) {
-          return done(null, false, { message: 'Faltan campos por rellenar' })
-      } else {
-          let newUser = { name, lastname, email, age, password }
-          let userCreated = await userManager.createUser(newUser)
-          return done(null, userCreated)
       }
+      
+      if (!name || !lastname || !email || !age || !password) {
+          return done(null, false, { message: 'Faltan campos por rellenar' })
+      }
+
+      let newUser = { name, lastname, email, age, password }
+      let userCreated = await userManager.createUser(newUser)
+      return done(null, userCreated)
+
     } catch (error) {
         return done(error)
     }

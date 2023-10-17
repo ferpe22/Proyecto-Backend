@@ -3,23 +3,23 @@
 <section class="container">
     <h2>Login</h2>
     
-    <form action="/api/sessions/" method="POST">
+    <form action="api/sessions/" class="form">
         <div class="col-md-6">
             <label for="email" class="form-label">Email:</label>
-            <input type="text" class="form-control" name="email" id="email" required>
+            <input type="email" class="form-control" name="email" id="email" required>
         </div>
         <div class="col-md-6">
             <label for="password" class="form-label">Password:</label>
             <input type="password" class="form-control" name="password" id="password" required>
         </div>
         <br>
-        <input type="submit" class="btn btn-primary margin-top" value="Entrar">
+        <input type="submit" id ="loginButton" class="btn btn-primary margin-top" value="Entrar">
     </form>
     <br>
     <div>
         <h4>GITHUB</h4>
         <p>Podes ingresar con tu cuenta de GitHub</p>
-        <a href="/api/sessions/github">Cliqueá aqui</a>
+        <a href="api/sessions/github">Cliqueá aqui</a>
     </div>
     <br>
     <br>
@@ -33,6 +33,6 @@
     
 </section>
 
-<script src="/socket.io/socket.io.js"></script>
-<script src="/js/register.js"></script>
+<script src="/src/utils/socketConnection.js"></script>
+<script src="/src/public/js/loginSystem/login.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>

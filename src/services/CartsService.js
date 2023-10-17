@@ -1,26 +1,45 @@
-const CartRepository = require('../repositories/CartRepository');
+const CartsRepository = require('../repositories/CartsRepository');
 const productModel = require('../dao/MongoDB/models/productModel');
 const cartModel = require('../dao/MongoDB/models/cartModel');
+const CustomError = require('./Errors/CustomErrors');
+const { generateNotFoundError } = require('./Errors/info');
+const EErrors = require('./Errors/enums')
 
 class CartService {
   constructor() {
-    this.repository = new CartRepository();
+    this.repository = new CartsRepository();
   }
 
   async getAllCarts() {
-    return await this.repository.getAllCarts();
+    try {
+      return this.repository.getAllCarts();
+    } catch (error) {
+      throw error;
+    }
   }
 
   async getCartById(id) {
-    return await this.repository.getCartById(id);
+    try {
+      return this.repository.getCartById(id);
+    } catch (error) {
+      throw error;
+    }
   }
 
   async addCart() {
-    return await this.repository.addCart();
+    try {
+      return this.repository.addCart()
+    } catch (error) {
+      throw error;
+    }
   }
 
   async addProductToCart(cid, pid) {
-    return await this.repository.addProductToCart(cid, pid);
+    try {
+      return this.repository.addProductToCart(cid, pid);
+    } catch (error) {
+      throw error;
+    }
   }
 
   async updateQtyProductInCart(cid, pid, quantity) {
@@ -29,17 +48,32 @@ class CartService {
       const product = await productModel.findById(pid);
 
       if(!product) {
-        throw new Error('El producto no se encuentra en el inventario')
+        CustomError.createError({
+          name: 'Error de agregado de producto al carrito',
+          cause: generateNotFoundError(pid, 'product'),
+          message: 'Producto no encontrado en inventario',
+          code: EErrors.DATABASE_ERROR
+        })
       }
 
       if (!cart) {
-        throw new Error('No se encuentra el carrito')
+        CustomError.createError({
+          name: 'Error de agregado de producto al carrito',
+          cause: generateNotFoundError(cid, 'cart'),
+          message: 'Carrito no encontrado',
+          code: EErrors.DATABASE_ERROR
+        })
       }
 
       const existProdInCart = cart[0].products.findIndex((p) => p.product._id.toString() === pid);
 
       if(existProdInCart === -1) {
-        throw new Error('El producto que desea actualizar no se encuentra en el carrito')
+        CustomError.createError({
+          name: 'Error de agregado de producto al carrito',
+          cause: generateNotFoundError(pid, 'productCart'),
+          message: 'El producto que desea actualizar no se encuentra en el carrito',
+          code: EErrors.DATABASE_ERROR
+        })
       }
 
       return this.repository.updateQtyProductInCart(cid, pid, quantity);
@@ -59,7 +93,7 @@ class CartService {
 
       const products = await productModel.find();
 
-      newProducts.array.forEach(p => {
+      newProducts.forEach(p => {
         const pID = p.product
         const quantity = p.quantity
 
@@ -123,7 +157,6 @@ class CartService {
     } catch (error) {
       throw error;
     }
-    
   }
 
   async deleteCart(cid) {
@@ -183,8 +216,6 @@ class CartService {
     } catch (error) {
       throw error
     }
-
-
   }
 }
 

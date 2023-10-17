@@ -1,6 +1,9 @@
 const ProductsRepository = require('../repositories/ProductsRepositoy')
+const CustomErrors = require('../services/Errors/CustomErrors')
+const { generateProductError } = require('../services/Errors/info')
+const EErrors = require('./Errors/enums')
 
-class ProductService {
+class ProductsService {
   constructor() {
     this.repository = new ProductsRepository()
   }
@@ -32,7 +35,12 @@ class ProductService {
       body.status === undefined ||
       body.status === ''
     ) {
-      throw new Error('Todos los campos son obligatorios')
+      CustomErrors.createError({
+        name: 'Error de creación de producto',
+        cause: generateProductError(body),
+        message: 'Se produjo un error al intentar crear el producto',
+        code: EErrors.INVALID_TYPE_ERROR
+      })
     }
 
     const newProduct = this.repository.addProduct(body)
@@ -49,4 +57,4 @@ class ProductService {
   }
 }
 
-module.exports = ProductService
+module.exports = ProductsService

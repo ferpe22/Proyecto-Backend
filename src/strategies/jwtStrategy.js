@@ -1,5 +1,5 @@
 const passportJWT = require('passport-jwt')
-const settings = require('../commands/command')
+//const settings = require('../commands/command')
 const JWT_KEY = process.env.JWT_KEY
 
 const JWTStrategy = passportJWT.Strategy

@@ -12,7 +12,7 @@ const authorizationMiddleware = (roles) => {
 
     if(!req.user) {
       if (contentType === 'application/json') {
-        return res.status(401).json({ error: 'Debes iniciar sesión para acceder a esta ruta' })
+        return res.status(401).json({ error: 'Debes iniciar sesión para acceder a esta sección' })
       }
       return res.redirect('/')
     }

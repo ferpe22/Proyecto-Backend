@@ -1,8 +1,8 @@
-const ProductService = require('../services/ProductService')
+const ProductsService = require('../services/ProducstService')
 
 class ProductsController {
   constructor() {
-    this.service = new ProductService()
+    this.service = new ProductsService()
   }
 
   async getAllProducts(req, res) {
@@ -28,7 +28,8 @@ class ProductsController {
       const products = await this.service.getAllProducts(filters, query)
 
       if (products.length === 0) {
-        return res.status(404).send({ status: 'Error', message: 'Productos no encontrados' })
+        //return res.status(404).send({ status: 'Error', message: 'Productos no encontrados' })
+        return res.sendError(404, 'Productos no encontrados')
       }
 
       const generatePageLink = (page) => {
@@ -54,10 +55,12 @@ class ProductsController {
         nextLink: products.NextPage ? generatePageLink(products.nextPage) : null  
       }
 
-      return res.status(200).json(result)
+      //return res.status(200).json(result)
+      return res.sendSuccess(200, result)
 
     } catch (error) {
-      return res.status(500).send({ status: 'Error', error: 'Error al obtener los productos', message: error.message })
+      //return res.status(500).send({ status: 'Error', error: 'Error al obtener los productos', message: error.message })
+      return res.sendError(500, 'Error al obtener los productos', error)
     }
   }
 
@@ -67,14 +70,17 @@ class ProductsController {
     try {
       const product = await this.service.getProductById(pid)
 
-      return res.status(200).json(product)
+      //return res.status(200).json(product)
+      return res.sendSuccess(200, product)
 
     } catch (error) {
       if (error.message === 'El producto no se encuenta en el inventario') {
-        return res.status(404).send({ status: 'Error', message: error.message })
+        //return res.status(404).send({ status: 'Error', message: error.message })
+        return res.sendError(404, 'El producto no se encuentra en el inventario', error.message)
       }
 
-      return res.status(500).send({ status: 'Error', error: 'Error al obtener los productos', message: error.message })
+      //return res.status(500).send({ status: 'Error', error: 'Error al obtener los productos', message: error.message })
+      return res.sendError(500, 'Error al obtener los productos', error)
     }
   }
 
@@ -84,11 +90,12 @@ class ProductsController {
     try {
       await this.service.addProduct(newProduct)
 
-      return res.status(201).send({ status: 'success', message: 'Producto agregado al inventario exitosamente' })
+      //return res.status(201).send({ status: 'success', message: 'Producto agregado al inventario exitosamente' })
+      return res.sendSuccess(201, 'Agregado exitosamente')
 
     } catch (error) {
-      console.log(error)
-      return res.status(500).send({ status: 'Error', error: 'Error al agregar el producto', message: error.message })
+      //return res.status(500).send({ status: 'Error', error: 'Error al agregar el producto', message: error.message })
+      return res.sendError(500, error)
     }
   }
 
@@ -99,14 +106,20 @@ class ProductsController {
     try {
       await this.service.updateProduct(pid, body)
 
-      return res.status(200).send({ status: 'success', message: 'Producto actualizado exitosamente' })
+      //return res.status(200).send({ status: 'success', message: 'Producto actualizado exitosamente' })
+      return res.sendSuccess(200, 'Actualizado exitosamente')
 
     } catch (error) {
       if(error.message === 'El producto no existe') {
-        return res.status(404).send({ status: 'Error', message: error.message })
+        //return res.status(404).send({ status: 'Error', message: error.message })
+        return res.sendError(404, 'El producto no existe', error.message)
+      }
+      if (error.code === 11000) {
+        return res.sendError(409, `El code: ${pid} ya existe`)
       }
 
-      return res.status(500).send({ status: 'Error', error: 'Error al actualizar el producto', message: error.message })
+      //return res.status(500).send({ status: 'Error', error: 'Error al actualizar el producto', message: error.message })
+      return res.sendError(500, 'Error al actualizar el producto', error)
     }
   }
 
@@ -116,12 +129,15 @@ class ProductsController {
     try {
       await this.service.deleteProduct(pid)
       
-      return res.status(200).send({ status: 'success', message: 'El producto ha sido borrado correctamente' })
+      //return res.status(200).send({ status: 'success', message: 'El producto ha sido borrado correctamente' })
+      return res.sendSuccess(200, 'Borrado exitosamente')
     } catch (error) {
       if(error.message === 'El producto no existe') {
-        return res.status(404).send({ status: 'Error', message: error.message })
+        //return res.status(404).send({ status: 'Error', message: error.message })
+        return res.sendError(404, 'El producto no existe', error.message)
       }
-      return res.status(500).send({ status: 'Error', error: 'Error al borrar el producto', message: error.message })
+      //return res.status(500).send({ status: 'Error', error: 'Error al borrar el producto', message: error.message })
+      return res.sendError(500, 'Error al borrar el producto', error)
     }
   }
 }

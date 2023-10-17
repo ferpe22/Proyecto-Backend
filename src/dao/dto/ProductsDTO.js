@@ -1,7 +1,7 @@
 class ProductsDTO {
   constructor(products) {
     this.products = products.docs,
-    this.total = products.total,
+    this.page = products.page,
     this.totalPages = products.totalPages,
     this.prevPage = products.prevPage,
     this.nextPage = products.nextPage,

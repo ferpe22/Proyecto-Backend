@@ -1,6 +1,6 @@
 const Dao = require('../dao/MongoDB/managers/ProductManagerMongo')
 
-class ProductRepository {
+class ProductsRepository {
   constructor() {
     this.dao = new Dao()
   }
@@ -30,4 +30,4 @@ class ProductRepository {
   }
 }
 
-module.exports = ProductRepository
+module.exports = ProductsRepository

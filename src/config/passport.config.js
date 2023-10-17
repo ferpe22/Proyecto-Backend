@@ -7,7 +7,6 @@ const jwtStrategy = require('../strategies/jwtStrategy')
 const UserManager = require('../dao/MongoDB/managers/UserManagerMongo')
 const userManager = new UserManager()
 
-
 const initializePassport = () => {
   passport.use('register', localRegisterStrategy)
   passport.use('login', localLoginStrategy)

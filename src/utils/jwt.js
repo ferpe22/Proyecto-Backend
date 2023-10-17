@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const settings = require('../commands/command')
+//const settings = require('../commands/command')
 const JWT_KEY = process.env.JWT_KEY
 
 const generateToken = (payload) => {

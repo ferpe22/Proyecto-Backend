@@ -1,23 +1,20 @@
-const { Router } = require('express')
+const BaseRouter = require('./BaseRouter')
 const CartsController = require('../controllers/CartsController')
+const cartController = new CartsController()
 const passportCall = require('../utils/passportCall')
 
-
-const cartsRouterFn = (io) => {
-    const cartsRouter = Router()
-    const cartController = new CartsController(io)
-
-    cartsRouter.get('/', cartController.getAllCarts.bind(cartController))
-    cartsRouter.get('/:cid', cartController.getCartById.bind(cartController))
-    cartsRouter.post('/', cartController.addCart.bind(cartController))
-    cartsRouter.post('/:cid/products/:pid', cartController.addProductToCart.bind(cartController))
-    cartsRouter.post('/:cid/purchase', passportCall('jwt'), cartController.finishPurchase.bind(cartController))
-    cartsRouter.put('/:cid/products/:pid', cartController.updateQtyProductInCart.bind(cartController))
-    cartsRouter.put('/:cid', cartController.updateArrayProductsInCart.bind(cartController))
-    cartsRouter.delete('/:cid/products/:pid', cartController.deleteProductInCart.bind(cartController))
-    cartsRouter.delete('/:cid', cartController.deleteAllProductsInCart.bind(cartController))
-
-    return cartsRouter
+class CartsRouter extends BaseRouter {
+  init() {
+    this.get('/', cartController.getAllCarts.bind(cartController))
+    this.get('/:cid', cartController.getCartById.bind(cartController))
+    this.post('/', cartController.addCart.bind(cartController))
+    this.post('/:cid/products/:pid', cartController.addProductToCart.bind(cartController))
+    this.post('/:cid/purchase', passportCall('jwt'), cartController.finishPurchase.bind(cartController))
+    this.put('/:cid/products/:pid', cartController.updateQtyProductInCart.bind(cartController))
+    this.put('/:cid', cartController.updateArrayProductsInCart.bind(cartController))
+    this.delete('/:cid/products/:pid', cartController.deleteProductInCart.bind(cartController))
+    this.delete('/:cid', cartController.deleteAllProductsInCart.bind(cartController))
+  }
 }
 
-module.exports = cartsRouterFn
+module.exports = CartsRouter

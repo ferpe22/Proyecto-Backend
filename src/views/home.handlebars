@@ -5,9 +5,9 @@
     <a href="/profile" class="bold">Profile</a>
     {{/unless}}
     <div>
-        <p>Welcome <span class="bold">{{user.first_name}}</span>!</p>
-        {{#if user.last_name}} <p><span class="bold">Lastname: </span>{{user.last_name}}</p>{{/if}}
-        <p><span class="bold">Age: </span>{{user.age}}</p>
+        <p>Bienvenido/a <span class="bold">{{user.name}}</span>!</p>
+        {{#if user.lastname}} <p><span class="bold">Apellido: </span>{{user.lastname}}</p>{{/if}}
+        <p><span class="bold">Edad: </span>{{user.age}}</p>
         {{#if user.email}} <p><span class="bold">Email: </span>{{user.email}}</p> {{/if}}
         <p><span class="bold">Role: </span>{{user.role}}</p>
     </div>
@@ -15,15 +15,15 @@
 </header>
 
 <section class="homeSection">
-    <h1>SHOP EASY - CODERHOUSE</h1>
-    <img src="/img/grow-shop.png" alt="Descripción de la imagen">
+    <h1>VENDEMOS TODO</h1>
+    <img src="" alt="Descripción de la imagen">
     <div>
         {{#unless admin}}
-        <a href="/products" class="bold">🔗 View Products</a>
+        <a href="/products" class="bold">🔗 Ver Productos</a>
         <a href="/chat" class="bold">🔗 Chat</a>
         {{/unless}}
         {{#if admin}}
-        <a href="/realtimeproducts" class="bold">🔗 Inventory</a>
+        <a href="/realtimeproducts" class="bold">🔗 Inventario</a>
         {{/if}}
     </div>
 </section>
@@ -70,5 +70,5 @@
     </div>
 </section> --}}
 
-{{!-- <script src="/socket.io/socket.io.js"></script> --}}
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>

@@ -1,17 +1,13 @@
-const { Router } = require('express')
+const BaseRouter = require('./BaseRouter')
 const ProductManager = require('../dao/MongoDB/managers/ProductManagerMongo')
 const CartManager = require('../dao/MongoDB/managers/CartManagerMongo')
 const passportCall = require('../utils/passportCall')
 const { authorizationMiddleware, isAuthorized } = require('../middlewares/usersMiddleware')
-//const ProductManager = require('../dao/FileSystem/ProductManager')
-const { openSession, needLogin, requireAdmin } = require('../middlewares/sessionMiddleware')
 
+const productManager = new ProductManager()
+const cartManager = new CartManager()
 
-const viewsRouterFn = (io) => {
-  const viewsRouter = Router()
-  const productManager = new ProductManager(io)
-  const cartManager = new CartManager(io)
-
+class ViewsRouter extends BaseRouter {
   handleProductsRoutes = async (req, res, viewName) => {
     const user = req.user
     const filters = {}
@@ -46,170 +42,171 @@ const viewsRouterFn = (io) => {
         }
       }
 
-      res.renderView({ viewName: viewName, locals: locals })
+      res.renderView({ view: viewName, locals: locals })
 
     } catch (error) {
-      res.render({ title: 'Error', message: error.message })
+        res.renderView({ view: 'error', locals: { tittle: 'Error', errorMessage: error.message }})
     }
-
   }
 
-  //VISTAS DE REGISTRO Y LOGIN DE USUARIOS
-  viewsRouter.get('/register', isAuthorized , async (req, res) => {
-      try {
-          return res.render('loginViews/register', { locals: { title: 'Registro'} })
+  init() {
+
+    //PRODUCTOS
+    this.get('/home', passportCall('jwt'), authorizationMiddleware(['ADMIN', 'USER']), async (req, res) => {
+      const user = req.user
+      const admin = req.user.role === 'ADMIN'
+      
+      try{
+          res.renderView({ view: 'home', locals: { title: 'Vendemos Todo', user, admin } })
       } catch (error) {
-          return res.render({ locals: { title: 'Error', message: error.message } })
-      }
-  })
+          return res.renderView({ view: 'error', locals: { tittle: 'Error', errorMessage: error.message }})
+        }
+    })
 
-  viewsRouter.get('/login', isAuthorized, async (req, res) => {
+    this.get('/realtimeproducts', passportCall('jwt'), authorizationMiddleware('ADMIN'), async (req, res) => {
+      this.handleProductsRoutes(req, res, 'productsViews/realTimeProducts')
+    })
+
+    this.get('/products', passportCall('jwt'), authorizationMiddleware('USER'), async (req, res) => {
+      this.handleProductsRoutes(req, res, 'productsViews/products')
+    })
+
+    this.get('/products/:pid', passportCall('jwt'), authorizationMiddleware('USER'), async (req, res) => {
+      const user = req.user
+      const pid = req.params.pid
       try {
-          return res.render('loginViews/login', { locals: { title: 'Login'} })
-      } catch (error) {
-          return res.render( { title: 'Error', message: error.message } )
-      }
-  })
-
-  viewsRouter.post('login', isAuthorized, async (req, res) => {
-    try {
-      return res.redirect('/profile')
-    } catch (error) {
-      return res.render( { title: 'Error', message: error.message } )
-    }
-  })
-
-  viewsRouter.get('/profile', passportCall('jwt'), authorizationMiddleware('USER', 'ADMIN') , async (req, res) => {
-    const user = req.user
-    try {
-      res.render('loginViews/profile', { locals: { title: 'Perfil', user: user } })
-    } catch (error) {
-        return res.render( { title: 'Error', message: error.message } )
-    }
-  })
+          const product = await productManager.getProductById(pid)
   
-  viewsRouter.get('/recoverypassword', isAuthorized, async (req, res) => {
-      try {
-          return res.render('loginViews/recoveryPassword', { locals: { title: 'Recuperar contraseña'} })
+          res.renderView({ view: 'productsViews/productDetail', locals: { title: 'Product Detail', product, user } })
       } catch (error) {
-          return res.render( { title: 'Error', message: error.message } )
+          res.renderView({ view: 'error', locals: { title: 'Error', errorMessage: error.message } })
       }
-  })
+    })
 
-  viewsRouter.get('/logout', async (req, res) => {
-    try{
-      res.clearCookie('authTokenCookie')
-      res.redirect('/')
-
-    } catch (error) {
-      res.render( { title: 'Error', message: error.message } )
-    }
-  })
-
-  //VISTAS DE PRODUCTOS
-  viewsRouter.get('/home', passportCall('jwt'), authorizationMiddleware(['ADMIN', 'USER']), async (req, res) => {
-    const user = req.user
-    const admin = req.user.role === 'ADMIN'
-    
-    try{
-        res.render('home', { title: 'Home', locals: { title: 'Vendemos Todo', user, admin } })
-    } catch (error) {
-        return res.render( { title: 'Error', message: error.message } )
-      }
-  })
+    this.get('/carts/:cid', passportCall('jwt'), authorizationMiddleware('USER'), async (req, res) => {
+      const user = req.user
+      const cid = req.params.cid
+      try {
+        const cart = await cartManager.getCartById(cid)
   
-  viewsRouter.get('/realTimeProducts', passportCall('jwt'), authorizationMiddleware('ADMIN'), async (req, res) => {
-    handleProductsRoutes(req, res, 'productsViews/realTimeProducts')
-  })
-
-  viewsRouter.get('/products', passportCall('jwt'), authorizationMiddleware('USER'), async (req, res) => {
-    handleProductsRoutes(req, res, 'productsViews/products')
-  })
-
-  //Visualizar detalle de producto
-  viewsRouter.get('/products/:pid', passportCall('jwt'), authorizationMiddleware('USER'), async (req, res) => {
-    const user = req.user
-    const pid = req.params.pid
-    try {
-        const product = await productManager.getProductById(pid)
-
-        return res.render('productsViews/productDetail', { locals: { title: 'Product Detail', product: product, user: user }})
-    } catch (error) {
-        return res.render( { title: 'Error', message: error.message } )
-    }
-  })
-  //visualizar el carrito especifico donde deberan estar SOLO los productos que pertenezcan a dicho carrito
-  viewsRouter.get('/carts/:cid', passportCall('jwt'), authorizationMiddleware('USER'), async (req, res) => {
-    const user = req.user
-    const cid = req.params.cid
-    try {
-      const cart = await cartManager.getCartById(cid)
-
-      if(req.user.cart !== cid) {
-        return res.render('error', { title: 'Error', message: 'No tenes permitado acceder a este carrito' })
-      }
-
-      const productsInCart = cart[0].products.map(p => p.toObject())
-      const { totalQuantity, totalPrice } = productsInCart.reduce((acc, item) => {
-        acc.totalQuantity += item.quantity;
-        acc.totalPrice += item.quantity * item.product.price;
-
-        return acc
-      }, { totalQuantity: 0, totalPrice: 0 });
-
-      if(cart[0].products.length === 0) {
-        const noProducts = true
-        return res.render('productsViews/cartDetail', { locals: { title: 'Cart Detail', noProducts, user } })
-      } else {
-        return res.render('productsViews/cartDetail', { locals: { title: 'Cart Detail', productsInCart, user, totalQuantity, totalPrice } })
-      }
-    } catch (error) {
-      res.render('error', { title: 'Error', message: error.message })
-    }
-  })
-
-  viewsRouter.get('/carts/:cid/purchase', passportCall('jwt'), authorizationMiddleware('USER'), async (req, res) => {
-    const user = req.user
-    const cid = req.params.cid
-    try {
-      const cart = await cartManager.getCartById(cid)
-
-      if(req.user.cart != cid){
-        return res.render('error', { title: 'Error', message: 'No tenes permitido acceder a este carrito' })
-      }
-
-      const productsInCart = cart[0].products.map((item) => {
-        const product = item.product
-        const quantity = item.quantity
-        const totalProductPrice = product.price * quantity
-        return { product: product.toObject(), quantity, totalProductPrice }
-      })
-
-      const { totalQuantity, totalPrice } = cart[0].products.reduce((acc, item) => {
-        acc.totalQuantity += item.quantity;
-        acc.totalPrice += item.quantity * item.product.price;
-
-        return acc
-      }, { totalQuantity: 0, totalPrice: 0 });
-
-      return res.render('productsViews/checkout', { locals: { title: 'Checkout', productsInCart, user, totalQuantity, totalPrice } })
-
-    } catch (error) {
-      res.render('error', { title: 'Error', message: error.message })
-    }
-  })
-
-  //VISTA DEL CHAT
-  viewsRouter.get('/chat', passportCall('jwt'), authorizationMiddleware('USER'), async (req, res) => {
-      try {
-        res.render('chat', { locals: { title: 'Chat' } })
+        if(req.user.cart !== cid) {
+          res.renderView({ view: 'error', locals: { title: 'Error', errorMessage: 'No tenes permitado acceder a este carrito'} })
+        }
+  
+        const productsInCart = cart[0].products.map(p => p.toObject())
+        const { totalQuantity, totalPrice } = productsInCart.reduce((acc, item) => {
+          acc.totalQuantity += item.quantity;
+          acc.totalPrice += item.quantity * item.product.price;
+  
+          return acc
+        }, { totalQuantity: 0, totalPrice: 0 });
+  
+        if(cart[0].products.length === 0) {
+          const noProducts = true
+          res.renderView({ view: 'productsViews/cartDetail', locals: { title: 'Cart Detail', noProducts, user } })
+        } else {
+          res.renderView({ view: 'productsViews/cartDetail', locals: { title: 'Cart Detail', productsInCart, user, totalQuantity, totalPrice } })
+        }
       } catch (error) {
-          res.render('error', { locals: { title: 'Error', message: error.message } })
+        res.renderView({ view: 'error', locals: { title: 'Error', errorMessage: error.message } })
       }
-  })
+    })
 
-  return viewsRouter
+    this.get('/carts/:cid/purchase', passportCall('jwt'), authorizationMiddleware('USER'), async (req, res) => {
+      const user = req.user
+      const cid = req.params.cid
+      try {
+        const cart = await cartManager.getCartById(cid)
+  
+        if(req.user.cart != cid){
+          res.renderView({ view: 'error', locals: { title: 'Error', errorMessage: 'No tenes permitado acceder a este carrito'} })
+        }
+  
+        const productsInCart = cart[0].products.map((item) => {
+          const product = item.product
+          const quantity = item.quantity
+          const totalProductPrice = product.price * quantity
+          return { product: product.toObject(), quantity, totalProductPrice }
+        })
+  
+        const { totalQuantity, totalPrice } = cart[0].products.reduce((acc, item) => {
+          acc.totalQuantity += item.quantity;
+          acc.totalPrice += item.quantity * item.product.price;
+  
+          return acc
+        }, { totalQuantity: 0, totalPrice: 0 });
+  
+        res.renderView({ view: 'productsViews/checkout', locals: { title: 'Checkout', user, productsInCart, totalPrice, totalQuantity } })
+  
+      } catch (error) {
+        res.renderView({ view: 'error', locals: { title: 'Error', errorMessage: error.message } })
+      }
+    })
+
+    //REGISTRO Y LOGIN
+    this.get('/register', isAuthorized, async (req, res) => {
+      try {
+          res.renderView({ view: 'loginViews/register', locals: { title: 'Registro'} })
+      } catch (error) {
+          res.renderView({ view: 'error', locals: { title: 'Error', errorMessage: error.message } })
+      }
+    })
+
+    this.get('/', isAuthorized, async (req, res) => {
+      try {
+          res.renderView({ view: 'loginViews/login', locals: { title: 'Login'} })
+      } catch (error) {
+          res.renderView({ view: 'error', locals: { title: 'Error', errorMessage: error.message } })
+      }
+    })
+
+    this.get('/recoverypassword', isAuthorized, async (req, res) => {
+      try {
+          res.renderView({ view: 'loginViews/recoveryPassword', locals: { title: 'Recuperar contraseña'} })
+      } catch (error) {
+          res.renderView({ view: 'error', locals: { title: 'Error', errorMessage: error.message } })
+      }
+    })
+
+    this.get('/profile', passportCall('jwt'), authorizationMiddleware('USER', 'ADMIN') , async (req, res) => {
+      const user = req.user
+      try {
+        res.renderView({ view: 'loginViews/profile', locals: { user, title: 'Perfil' } })
+      } catch (error) {
+          res.renderView({ view: 'error', locals: { title: 'Error', errorMessage: error.message } })
+      }
+    })
+
+    this.get('/logout', async (req, res) => {
+      try{
+        res.clearCookie('authTokenCookie')
+        res.redirect('/')
+  
+      } catch (error) {
+        res.renderView({ view: 'error', locals: { title: 'Error', message: error.message } })
+      }
+    })
+
+    //CHAT
+    this.get('/chat', passportCall('jwt'), authorizationMiddleware('USER'), async (req, res) => {
+      try {
+        res.renderView({ view: 'chat', locals: { title: 'Chat' } })
+      } catch (error) {
+          res.renderView({ view: 'error', locals: { title: 'Error', errorMessage: error.message } })
+      }
+    })
+
+    //OTRAS
+    this.get('/error', (req, res) => {
+      const errorMessage = req.query.errorMessage || 'Ha ocurrido un error'
+      res.renderView({ view: 'error', locals: { title: 'Error', errorMessage: errorMessage } })
+    })
+
+    this.get('*', (req, res) => {
+      res.renderView({ view: 'notFound', locals: { title: 'No encontrado' } })
+    })
+  }
 }
 
-module.exports = viewsRouterFn
+module.exports = ViewsRouter
 
