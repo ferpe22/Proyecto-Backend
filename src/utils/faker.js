@@ -1,6 +1,6 @@
-const { faker } = require('@faker-js/faker')
+const { fakerES: faker } = require('@faker-js/faker')
 
-faker.location = 'es'
+//faker.location = 'es'
 
 const generateProducts = () => {
     return {
