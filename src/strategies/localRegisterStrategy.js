@@ -18,7 +18,7 @@ const localRegisterStrategy = new LocalStrategy({
           return done(null, false, { message: 'El usuario ya existe' })
       }
       
-      if (!name || !lastname || !email || !age || !password) {
+      if (!name || !lastname || !email, !age, !password) {
           return done(null, false, { message: 'Faltan campos por rellenar' })
       }
 

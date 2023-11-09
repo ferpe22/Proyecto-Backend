@@ -1,9 +1,12 @@
 const CartsRepository = require('../repositories/CartsRepository');
-const productModel = require('../dao/MongoDB/models/productModel');
-const cartModel = require('../dao/MongoDB/models/cartModel');
-const CustomError = require('./Errors/CustomErrors');
-const { generateNotFoundError } = require('./Errors/info');
-const EErrors = require('./Errors/enums')
+const ProductsRepository = require('../repositories/ProductsRepositoy');
+//const CustomError = require('./Errors/CustomErrors');
+//const { generateNotFoundError } = require('./Errors/info');
+//const EErrors = require('./Errors/enums')
+const { trasportGmail } = require('../config/nodemailer.config') 
+const settings = require('../commands/command')
+
+const productsRepository = new ProductsRepository();
 
 class CartService {
   constructor() {
@@ -34,8 +37,28 @@ class CartService {
     }
   }
 
-  async addProductToCart(cid, pid) {
+  async addProductToCart(cid, pid, userId) {
     try {
+      const cart = await this.repository.getCartById(cid);
+
+      if(cart.length === 0) {
+        throw new Error('El carrito no encontrado')
+      }
+
+      const product = await productsRepository.getProductById(pid); 
+
+      if(!product) {
+        throw new Error('El producto no se encuentra en el inventario')
+      }
+
+      if(userId === product.owner) {
+        throw new Error('Sos el propietario del producto')
+      }
+
+      if(!userId || userId === '1') {
+        throw new Error('No eres un usuario admitido para agregar productos a carrito')
+      }
+
       return this.repository.addProductToCart(cid, pid);
     } catch (error) {
       throw error;
@@ -45,35 +68,20 @@ class CartService {
   async updateQtyProductInCart(cid, pid, quantity) {
     try {
       const cart = await this.repository.getCartById(cid);
-      const product = await productModel.findById(pid);
+      const product = await productsRepository.getProductById(pid);
 
       if(!product) {
-        CustomError.createError({
-          name: 'Error de agregado de producto al carrito',
-          cause: generateNotFoundError(pid, 'product'),
-          message: 'Producto no encontrado en inventario',
-          code: EErrors.DATABASE_ERROR
-        })
+        throw new Error('El producto no se encuentra en el inventario')
       }
 
       if (!cart) {
-        CustomError.createError({
-          name: 'Error de agregado de producto al carrito',
-          cause: generateNotFoundError(cid, 'cart'),
-          message: 'Carrito no encontrado',
-          code: EErrors.DATABASE_ERROR
-        })
+        throw new Error('No se pudo encontrar el carrito')
       }
 
       const existProdInCart = cart[0].products.findIndex((p) => p.product._id.toString() === pid);
 
       if(existProdInCart === -1) {
-        CustomError.createError({
-          name: 'Error de agregado de producto al carrito',
-          cause: generateNotFoundError(pid, 'productCart'),
-          message: 'El producto que desea actualizar no se encuentra en el carrito',
-          code: EErrors.DATABASE_ERROR
-        })
+        throw new Error('El producto que desea modificar no se encuentra en el carrito')
       }
 
       return this.repository.updateQtyProductInCart(cid, pid, quantity);
@@ -91,17 +99,18 @@ class CartService {
         throw new Error('No se pudo encontrar el carrito')
       }
 
-      const products = await productModel.find();
+      const prodInStock = await productsRepository.getAllProducts()
+      const products = prodInStock.products
 
       newProducts.forEach(p => {
-        const pID = p.product
+        const pId = p.product
         const quantity = p.quantity
 
-        if(!pID || !quantity){
+        if(!pId || !quantity){
           throw new Error('Se deben completar los campos de ID y cantidad de productos')
         }
 
-        const stockProductId = products.find(p => p._id.toString() === pID);
+        const stockProductId = products.find(p => p._id.toString() === pId);
 
         if (!stockProductId){
           throw new Error('Los IDs detallados no corresponden a productos en nuestro stock')
@@ -118,7 +127,7 @@ class CartService {
   async deleteProductInCart(cid, pid) {
     try {
       const cart = await this.repository.getCartById(cid);
-      const product = await productModel.findById(pid);
+      const product = await productsRepository.getProductById(pid);
 
       if(!product) {
         throw new Error('El producto no se encuentra en el inventario')
@@ -169,16 +178,16 @@ class CartService {
     const prodWithoutStock = []
 
     try {
-      const cart = await cartModel.findById(data.cid)
+      const cart = await this.repository.getCartById(data.cid)
       
       if(!cart) {
         throw new Error('No se pudo encontrar el carrito seleccionado')
       }
 
-      const prodToBuy = cart.products
+      const prodToBuy = cart[0].products
 
-      for(const productData of prodToBuy.quantity){
-        const product = await productModel.findById(productData.product)
+      for(const productData of prodToBuy){
+        const product = await productsRepository.getProductById(productData.product)
 
         if(!product) {
           throw new Error(`El producto "${productData.product.title}" no existe`)
@@ -189,27 +198,59 @@ class CartService {
           totalAmount += productTotal
           product.stock -= productData.quantity
           
-          await product.save()
+          await productsRepository.updateProduct(product.id, { stock: product.stock })
         } else {
-          prodWithoutStock.push(product.id)
+          prodWithoutStock.push(product._id)
         }
       }
 
-      if (prodWithoutStock.length === cart.products.length) {
+      if (prodWithoutStock.length === cart[0].products.length) {
         throw new Error('No hay stock suficiente para todos los productos')
       }
 
-      cart.products = cart.product.filter((productData) => 
-        prodWithoutStock.includes(productData.id)
-      )
+      const filteredProducts = cart[0].products.filter((productData) => {
+        return prodWithoutStock.some(id => id.equals(productData.product._id))
+      })
+
+      cart[0].products = filteredProducts
 
       const dataOrder = {
-        purchaser: user.email || user.name,
         amount: totalAmount,
+        purchaser: user.email || user.name,
         prodWithoutStock
       }
 
-      await cart.save()
+      if(dataOrder.prodWithoutStock.length === 0) {
+        await trasportGmail.sendEmail({
+          from: `VendemosTodo <${settings.emailUser}>`,
+          to: user.email,
+          subject: 'Orden de compra',
+          html: `<div>
+                  <h1>Gracias por tu compra</h1>
+                  <p>El codigo de su orden de compra es: ${dataOrder._id}</p> 
+                  <p>El total de tu compra es de: ${dataOrder.amount}</p>
+                  <p>Gracias por preferirnos</p>
+                </div>`,
+          attachments: []
+        })
+
+      } else {
+        await trasportGmail.sendEmail({
+          from: `VendemosTodo <${settings.emailUser}>`,
+          to: user.email,
+          subject: 'Orden de compra - parcial',
+          html: `<div>
+                  <h1>Gracias por tu compra</h1>
+                  <p>El total de tu compra es de: ${dataOrder.amount}</p>
+                  <p>Algunos productos no tienen stock, pero el resto de los productos han sido agregados exitosamente</p>
+                  <p>Productos sin stock: ${dataOrder.prodWithoutStock}</p>
+                  <p>Gracias por preferirnos</p>
+                </div>`,
+          attachments: []
+        })
+      }
+
+      await this.repository.updateArrayProductsInCart(data.cid, cart[0].products)
       
       return this.repository.finishPurchase(dataOrder)
 

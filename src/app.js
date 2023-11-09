@@ -12,11 +12,31 @@ const passport = require('passport')
 const InitializePassport = require('./config/passport.config')
 const flash = require('connect-flash')
 const path = require('path')
+const swaggerJsDocs = require('swagger-jsdoc')
+const swaggerUiExpress = require('swagger-ui-express')
+const errorMiddleware = require('./middlewares/errorMiddleware')
+const addLogger = require('./utils/logger')
 
 
 const app = express() //Creacion de aplicacion express
 
 MongoDb.getConnection()
+
+app.use(addLogger)
+
+const swaggerOptions = {
+  definitions: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Documentacion de VendemosTodo',
+      description: 'API para la gestión de productos',
+    },
+    apis: [`${__dirname}/docs/**/*.yaml`],
+  }
+}
+
+const specs = swaggerJsDocs(swaggerOptions)
+app.use('/apidocs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs))
 
 //Configuraicon de handlebars
 app.engine('handlebars', handlebars.engine()) //inicializar el motor
@@ -59,8 +79,6 @@ const io = new Server(httpServer)
 socketConnection(io)
 
 
-//SOCKETS
-
 //ROUTERS
 const ProductsRouter = require('./routers/ProductsRouter')
 const productsRouter = new ProductsRouter()
@@ -74,8 +92,10 @@ const viewsRouter = new ViewsRouter()
 
 app.use('/api/products', productsRouter.getRouter());
 app.use('/api/carts', cartsRouter.getRouter());
-app.use('/api/sessions', sessionRouter.getRouter());
+app.use('/api/users', sessionRouter.getRouter());
 app.use('/', viewsRouter.getRouter());
+
+app.use(errorMiddleware)
 
 
 //ENDPOINTS
@@ -84,4 +104,13 @@ app.get('/healthcheck', (req, res) => {
         status: 'running',
         date: new Date()
     })    
+})
+
+app.get('/loggerTest', (req, res) => {
+  req.logger.debug('Test de desarrollo')
+
+  req.logger.info('Test de produccion en consola')
+  req.logger.console.error('Test de produccion de log en archivo')
+
+  res.send({ message: 'Logger Test!' })
 })

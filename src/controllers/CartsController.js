@@ -32,7 +32,7 @@ class CartsController {
 
       if(cart.length === 0) {
         //return res.status(404).send({ status: 'error', message: 'Carrito no encontrado'})
-        return res.sendError(404, 'Carrito no encontrado')
+        return res.sendError(404, 'Error al obtener los carritos', 'Carrito no encontrado')
       }
 
       //return res.status(200).json({ status: 'success', payload: cart})
@@ -57,28 +57,23 @@ class CartsController {
   }
 
   async addProductToCart(req, res) {
-    const cid = req.params.cid
-    const pid = req.params.pid
+    const { cid, pid } = req.params
+    const userId = req.body.userId
 
     try {
-      await this.service.addProductToCart(cid, pid)
+      await this.service.addProductToCart(cid, pid, userId)
 
       //return res.status(201).send({ status: 'success', message: 'Producto agregado al carrito exitosamente' })
       return res.sendSuccess(201, 'Agregado exitosamente')
 
     } catch (error) {
-      if (error.message === 'El producto no se encuentra en el inventario') {
-          //return res.status(404).send({ error: 'Product Not Found', message: 'El producto que intentas agregar no se encuentra en inventario' })
-          return res.sendError(404, { ...error, cause: error.cause })
-      }
-
-      if (error.message === 'No se encuentra el carrito') {
-          //return res.status(404).send({ error: 'Cart Not Found', message: 'No se pueda ingresar productos a un carrito inexistente' })
-          return res.sendError(404, { ...error, cause: error.cause })
+      if (error.message === 'El producto no se encuentra en el inventario' || error.message === 'No se encuentra el carrito') {
+        //return res.status(404).send({ error: 'Product Not Found', message: 'El producto que intentas agregar no se encuentra en inventario' })
+        return res.sendError(404, error.message)
       }
 
       //return res.status(500).send({ error: 'Error al guardar el producto en el carrito', message: error.message })
-      return res.sendError(500, error)
+      return res.sendError(500, error.message)
     }
   }
 
@@ -121,7 +116,7 @@ class CartsController {
         return res.sendError(409, 'No se puede actualizar la lista de productos sin informaicon del mismo')
       }
       
-      await this.service.updateQtyProductInCart(cid, newProducts)
+      await this.service.updateArrayProductsInCart(cid, newProducts)
       
       //return res.status(200).send({ status: 'success', message: 'La actualizacion ha sido exitosa' })
       return res.sendSuccess(200, 'La actualizacion ha sido exitosa')
@@ -184,8 +179,8 @@ class CartsController {
       }
 
       const order = await this.service.finishPurchase({ cid, user })
-      let result;
-      try {
+      return res.sendSuccess(200, order)
+      /*try {
         if (order.prodWithoutStock.length === 0) {
           result = await transportGmail.sendMail({
             from: `VendemosTodo <${settings.emailUser}>`,
@@ -222,7 +217,7 @@ class CartsController {
       }
 
       //return res.status(201).json({ status: 'success', payload: order })
-      return res.sendSuccess(201, order)
+      return res.sendSuccess(201, order)*/
 
     } catch (error) {
         if(error.message === 'No hay stock suficiente para todos los productos') {
@@ -230,7 +225,7 @@ class CartsController {
           return res.sendError(409, error.message)
         }
         //return res.status(500).send({ error: 'Error al finalizar la compra', message: error.message })
-        return res.sendError(500, 'Error en la compra', error)
+        return res.sendError(500, error.message)
     }
   }
 }

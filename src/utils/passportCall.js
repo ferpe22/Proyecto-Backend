@@ -1,4 +1,6 @@
 const passport = require('passport')
+const customError = require('../services/Errors/CustomErrors')
+const EErrors = require('../services/Errors/CustomErrors')
 
 const passportCall = (strategy) => {
   return (req, res, next) => {
@@ -9,12 +11,18 @@ const passportCall = (strategy) => {
 
       if(!user) {
         const errorMessage = (info && info.message) ? info.message : info ? info.toString() : 'Authentication failed'
-        return res.status(401).send({ error: errorMessage })
+        const error = customError.createError({
+          name: 'Authentication error',
+          cause: errorMessage,
+          message: errorMessage,
+          code: EErrors.AUTHENTICATION_ERROR
+        })
+        return next(error)
       }
 
       req.user = user
-      next()
-    })(req, res, next)
+      next();
+    })(req, res, next);
   }
 }
 

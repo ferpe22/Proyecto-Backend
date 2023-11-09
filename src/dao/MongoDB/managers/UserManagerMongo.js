@@ -2,7 +2,7 @@ const userModel = require('../models/userModel')
 const CartManager = require('./CartManagerMongo')
 const cartManager = new CartManager()
 const cartModel = require('../models/cartModel')
-const { createHash } = require('../../../utils/passwordHash')
+const { createHash, isValidPassword } = require('../../../utils/passwordHash')
 
 class UserManager {
   constructor() {
@@ -77,7 +77,7 @@ class UserManager {
         await cartManager.addProductToCart(user.cart, productId)
       }
     } catch (error) {
-      return error
+        return error
     }
   }
 
@@ -87,13 +87,16 @@ class UserManager {
 
       if(!user) {
           throw new Error('El usuario no existe')
+
       } else {
           const cart = await cartManager.getCartById(user.cart)
+          
           await cartModel.deleteOne({ _id: cart })
+          
           await this.model.deleteOne({ _id: id })
       }
     } catch (error) {
-        return error
+        throw error
     }
   }
 
@@ -108,18 +111,43 @@ class UserManager {
     }
   }
 
-  async resetPassword (email, password) {
+  async resetPassword (userId, password) {
     try {
-      const user = await this.model.findOne({ email })
+      const user = await this.model.findOne({ _id: userId })
 
       if(!user) {
           throw new Error(`El usuario con el email ${email} no existe`)
-      } else {
-          const newPassword = createHash(password)
-          await this.model.updateOne({ email: user.email }, { password: newPassword })
       }
+
+      if(isValidPassword(password, user.password)) {
+        throw new Error('La nueva contraseña no puede ser igual a la anterior')
+      }
+
+      const newPassword = createHash(password)
+      
+      await this.model.updateOne({ _id: user._id }, { password: newPassword })
+    
     } catch (error) {
         return error
+    }
+  }
+
+  async updateUserRole(userid, newRole) {
+    try {
+      const user = await this.model.findOne({ _id: userid })
+      if(!user) {
+          throw new Error(`El usuario con el email ${email} no existe`)
+      }
+
+      await this.model.updateOne({ _id: user._id }, { role: newRole })
+
+      const updatedUser = user.toObject()
+      delete updatedUser.password
+
+      return updatedUser
+
+    } catch (error) {
+        throw error
     }
   }
 }

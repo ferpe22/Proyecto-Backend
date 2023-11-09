@@ -1,88 +1,48 @@
-const Dao = require('../dao/MongoDB/managers/CartManagerMongo')
+const getCartsDao = require('../factories/cartsDAOFactory')
 
 class CartsRepository {
   constructor() {
-    this.dao = new Dao()
+    this.dao = getCartsDao(process.env.STORAGE)
   }
 
   async getAllCarts() {
-    try {
-      return this.dao.getAllCarts()
-    } catch (error) {
-        throw error
-    }
+    return this.dao.getAllCarts()
   }
 
   async getCartById(id) {
-    try {
-      return await this.dao.getCartById(id)
-    } catch (error) {
-      throw error
-    }
+    return this.dao.getCartById(id)
   }
 
   async addCart() {
-    try {
-      return await this.dao.addCart()
-    } catch (error) {
-        throw error
-    }
+    return this.dao.addCart()
   }
 
-  async addProductToCart(cid, pid) {
-    try {
-      return await this.dao.addProductToCart(cid, pid)
-    } catch (error) {
-        throw error
-    }
+  async addProductToCart(cid, pid, userId) {
+    return this.dao.addProductToCart(cid, pid, userId)
   }
 
   async updateQtyProductInCart(cid, pid, quantity) {
-    try {
-      return await this.dao.updateQtyProductInCart(cid, pid, quantity)
-    } catch (error) {
-        throw error
-    }
+    return this.dao.updateQtyProductInCart(cid, pid, quantity)
   }
 
   async updateArrayProductsInCart(cid, newProducts) {
-    try {
-      return await this.dao.updateArrayProductsInCart(cid, newProducts)
-    } catch (error) {
-        throw error
-    }
+    return  this.dao.updateArrayProductsInCart(cid, newProducts)
   }
 
   async deleteProductInCart(cid, pid) {
-    try {
-      return await this.dao.deleteProductInCart(cid, pid)
-  } catch (error) {
-      throw error
-    }
+    return this.dao.deleteProductInCart(cid, pid)
   }
 
   async deleteAllProductsInCart(cid) {
-    try {
-      return await this.dao.deleteAllProductsInCart(cid)
-  } catch (error) {
-      throw error
-    }
+    return this.dao.deleteAllProductsInCart(cid)
   }
 
   async deleteCart(cid) {
-    try {
-      return await this.dao.deleteCart(cid)
-  } catch (error) {
-      throw error
-    }
+    return this.dao.deleteCart(cid)
   }
 
-  async finishPurchase(data) {
-    try {
-      return await this.dao.finishPurchase(data)
-    } catch (error) {
-        throw error
-    }
+  async finishPurchase(body) {
+    return this.dao.finishPurchase(body)
   }
 }
 

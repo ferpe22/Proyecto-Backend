@@ -8,7 +8,7 @@ class TicketManager {
 
   async getOrderById(id) {
     try {
-      const order = await this.model.find({_id: id})
+      const order = await ticketModel.findOne({_id: id})
 
       if(!order) {
         throw new Error('No se encontro la orden')

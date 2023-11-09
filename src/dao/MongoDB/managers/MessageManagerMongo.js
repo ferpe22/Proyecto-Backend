@@ -9,7 +9,7 @@ class MessageManager {
   async getAllMessages() {
     try {
         const messages = await this.model.find()
-        return messages.map(m => m.toObject())
+        return messages.map((m) => m.toObject())
     } catch (error) {
         throw error
     }

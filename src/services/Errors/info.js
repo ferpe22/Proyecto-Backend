@@ -1,6 +1,6 @@
 const generateProductError = (product) => {
   return `Una o más propiedades de un producto no son válidas:
-  *title: Debe ser tipo String, se recibio: ${product.tittle}
+  *title: Debe ser tipo String, se recibio: ${product.title}
   *description: Debe ser tipo String, se recibio: ${product.description}
   *price: Debe ser tipo Number, se recibio: ${product.price}
   *code: Debe ser tipo String, se recibio: ${product.code}

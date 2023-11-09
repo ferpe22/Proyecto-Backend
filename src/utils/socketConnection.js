@@ -9,12 +9,10 @@
 // module.exports = init
 
 const moment  = require('moment')
-const ProductManager = require('../dao/MongoDB/managers/ProductManagerMongo')
-const CMessageManager = require('../dao/MongoDB/managers/MessageManagerMongo')
+const MessageManager = require('../dao/MongoDB/managers/MessageManagerMongo')
 
 const socketConnection = (io) => {
-  const productManager = new ProductManager()
-  const messageManager = new CMessageManager()
+  const messageManager = new MessageManager()
 
   io.on('connection', (socket) => {
     console.log('Nuevo cliente conectado!', socket.id)

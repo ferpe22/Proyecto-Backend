@@ -1,3 +1,6 @@
+const customError = require('../services/Errors/CustomErrors')
+const EErrors = require('../services/Errors/enums')
+
 const isAuthorized = (req, res, next) => {
   if(req.headers && req.headers.cookie && req.headers.cookie.replace('authTokenCookie=', '')) {
     return res.redirect('/profile')
@@ -8,19 +11,19 @@ const isAuthorized = (req, res, next) => {
 
 const authorizationMiddleware = (roles) => {
   return (req, res, next) => {
-    const contentType = req.headers['content-type']
-
-    if(!req.user) {
-      if (contentType === 'application/json') {
-        return res.status(401).json({ error: 'Debes iniciar sesión para acceder a esta sección' })
-      }
-      return res.redirect('/')
-    }
 
     if(!roles.includes(req.user.role)) {
-      return res.status(403).json({ error: 'No tenes permiso para acceder a este recurso' })
+      const error = customError.createError({
+        name: 'Authorization error',
+        cause: 'No tienes autorizacion para consumir este recurso',
+        message: 'No tienes autorizacion para consumir este recurso',
+        code: EErrors.AUTHORIZATION_ERROR
+      })
+      
+      return next(error)
     }
-    next()
+    
+  next()
   }
 }
 

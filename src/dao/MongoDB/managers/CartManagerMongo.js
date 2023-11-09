@@ -3,7 +3,7 @@ const productModel = require('../models/productModel')
 const TicketManager = require('./TicketManagerMongo')
 const ticketManager = new TicketManager()
 const CustomError = require('../../../services/Errors/CustomErrors')
-const { generateProductError, generateNotFoundError } = require('../../../services/Errors/info')
+const { generateNotFoundError } = require('../../../services/Errors/info')
 const EErrors = require('../../../services/Errors/enums')
 
 class CartManager {
@@ -15,10 +15,6 @@ class CartManager {
     try {
       const carts = await this.model.find()
 
-      // if(carts.length === 0) {
-      //     throw new Error('No hay carritos para mostrar')
-      // }
-
       return carts.map(c => c.toObject())
     } catch (error) {
         throw error
@@ -27,11 +23,8 @@ class CartManager {
 
   async getCartById(id) {
     try {
-      const cart = await this.model.find({_id: id})
+      const cart = await this.model.find({ _id: id }) 
       
-      // if(!cart) {
-      //     throw new Error('No se pudo encontrar el carrito seleccionado')
-      // }
       return cart
     } catch (error) {
         throw error
@@ -48,20 +41,10 @@ class CartManager {
     }
   }
 
-  async addProductToCart(cid, pid) {
+  async addProductToCart(cid, pid, userId) {
     try {
       const cart = await this.model.findById(cid)
       const product = await productModel.findById(pid)
-
-      if(!product) {
-        CustomError.createError({
-          name: 'Error de agregado de producto al carrito',
-          cause: generateNotFoundError(pid, 'product'),
-          message: 'Producto no encontrado en inventario',
-          code: EErrors.DATABASE_ERROR
-
-        })
-      }
 
       if (!cart) {
         CustomError.createError({
@@ -73,10 +56,24 @@ class CartManager {
         })
       }
 
+      if(!product) {
+        CustomError.createError({
+          name: 'Error de agregado de producto al carrito',
+          cause: generateNotFoundError(pid, 'product'),
+          message: 'Producto no encontrado en inventario',
+          code: EErrors.DATABASE_ERROR
+
+        })
+      }
+
+      if (userId !== '1' && !userId && userId === product.owner) {
+        throw new Error('Sos el propietario del producto')
+      }
+
       const existProdInCart = cart.products.findIndex((p) => p.product._id.toString() === pid);
 
       const productToAdd = {
-          product: product.id,
+          product: pid,
           quantity: 1
       };
 
@@ -84,10 +81,7 @@ class CartManager {
           ? cart.products[existProdInCart].quantity++
           : cart.products.push(productToAdd);
 
-      await this.model.updateOne(
-          { _id: cart._id },
-          { $set: { products: cart.products } }
-      );
+      await cart.save();
 
     } catch (error) {
         throw error
@@ -97,20 +91,6 @@ class CartManager {
   async updateQtyProductInCart(cid, pid, quantity) {
     try {
       const cart = await this.model.findById(cid)
-      //const product = await productModel.findById(pid)
-
-      // if(!product) {
-      //     throw new Error('El producto no se encuentra en el inventario')
-      // }
-
-      // if (!cart) {
-      //     throw new Error('No se encuentra el carrito')
-      // }
-
-      // const existProdInCart = cart.products.findIndex((p) => p.product._id.toString() === pid);
-
-      // if (existProdInCart === -1)
-      //     throw new Error('El producto no se encuentra en el carrito')
 
       await this.model.updateOne(
           { _id: cart._id, 'products.product': pid },
@@ -125,35 +105,6 @@ class CartManager {
   async updateArrayProductsInCart(cid, newProducts) {
     try{
       const cart = await this.model.findById(cid)
-      //const products = await productModel.find()
-
-      // if (!cart) {
-      //     throw new Error('No se encuentra el carrito')
-      // }
-
-      // if(products.length === 0){
-      //     throw new Error('No hay productos en inventario')
-      // }
-
-      // if(!newProducts){
-      //     throw new Error('No se puede actualizar la lista de productos sin informaicon del mismo')
-      // }
-
-      // newProducts.forEach((p) => {
-      //     const prodId = p.product;
-      //     const quantity = p.quantity
-      
-
-      //     if(!prodId || quantity){
-      //         throw new Error('Se deben completar los campos de ID y cantidad de productos')
-      //     }
-
-      //     const existProductInStock = products.find((p) => p._id.toString() === prodId);
-
-      //     if(!existProductInStock){
-      //         throw new Error('Los IDs detallados no corresponden a productos en nuestro stock')
-      //     }
-      // });
 
       await this.model.updateOne(
           { _id: cart._id },
@@ -168,19 +119,6 @@ class CartManager {
   async deleteProductInCart(cid, pid) {
     try {
       const cart = await this.model.findById(cid)
-      // const product = await productModel.findById(pid)
-
-      // if(!product) {
-      //     throw new Error('El producto no existe en nuestro inventario')
-      // }
-
-      // if (!cart) {
-      //     throw new Error('No se encuentra el carrito')
-      // }
-
-      // const existProdInCart = cart.products.findIndex((p) => p.product._id.toString() === pid);
-      // if (existProdInCart === -1)
-      //     throw new Error('El producto no se encuentra en el carrito')
 
       await this.model.updateOne(
           { _id: cart._id },
@@ -196,14 +134,6 @@ class CartManager {
     try {
       const cart = await this.model.findById(cid)
 
-      // if (!cart) {
-      //     throw new Error('No se encuentra el carrito')
-      // }
-
-      // if (cart.length === 0) {
-      //     throw new Error('El carrito esta vacio')
-      // }
-
       await this.model.updateOne(
           { _id: cart._id },
           { $set: { products: [] } }
@@ -214,17 +144,9 @@ class CartManager {
     }
   }
 
-  async deleteCart(cid) {
+  /*async deleteCart(cid) {
     try {
       const cart = await this.model.findById(cid)
-
-      // if (!cart) {
-      //     throw new Error('No se encuentra el carrito')
-      // }
-
-      // if (cart.length === 0) {
-      //     throw new Error('El carrito esta vacio')
-      // }
 
       await this.model.deleteOne(
           { _id: cart._id }
@@ -233,7 +155,7 @@ class CartManager {
     } catch (error) {
         throw error
     }
-  }
+  }*/
 
   async finishPurchase(data) {
     try {
@@ -243,9 +165,19 @@ class CartManager {
       })
       return {
         purchaser: newOrder.purchaser,
-        amount: newOrder.amount,
-        prodWithoutStock: data.prodWithoutStock
+        prodWithoutStock: data.prodWithoutStock,
+        amount: newOrder.amount
       }
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async saveCart(cart) {
+    try {
+      await this.model.updateOne({ _id: cart._id }, cart );
+
+      return cart
     } catch (error) {
       throw error
     }
